@@ -2,30 +2,43 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { start } from 'repl';
 
 async function getCodeSelectionInfo():Promise<void>{
     let active_file_path:string = vscode.window.activeTextEditor.document.fileName;
     let active_file_path_for_vscode_URI = "file"+active_file_path.replace(/(c|C)\:/g,"").replace(/\\/g,"/");
     let ncp = require("copy-paste");
     let uri = vscode.window.activeTextEditor.document.uri;
-    let symbol:object = await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
+    let symbol:Array<any> = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
+    let functions = symbol.filter((elem, index, array)=>{
+        return (elem.kind == 11)
+    })
 
-    vscode.window.activeTextEditor.selections.forEach( (selection, index, array)=>{                
+    vscode.window.activeTextEditor.selections.forEach( async (selection, index, array)=>{                
         let start_line:string = (selection.start.line +1).toString();
         let end_line:string = (selection.end.line +1).toString();
         let line_str:string = selection.isSingleLine?start_line:start_line+" - "+end_line;
-        
-        
+
+        let matched_function_name = "undefined";
+        for(let f of functions){
+            if(f.location.range._start._line < selection.start.line){
+                matched_function_name = f.name;
+            }else{
+                break;
+            }
+        }
+                
         let copyText = 
-            `
-            file: ${active_file_path}
-            line: ${line_str}
-            cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0            
-            code:
-            \`\`\`
-            ${vscode.window.activeTextEditor.document.getText(selection)}
-            \`\`\`
-            `;
+`
+file: ${active_file_path}
+line: ${line_str}
+func: ${matched_function_name}
+cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0            
+code:
+\`\`\`
+${vscode.window.activeTextEditor.document.getText(selection)}
+\`\`\`
+`;
 
         console.log(copyText) ;
         
@@ -53,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
         // Display a message box to the user
-        let success = getCodeSelectionInfo();
+        getCodeSelectionInfo();
     });
 
     context.subscriptions.push(disposable);

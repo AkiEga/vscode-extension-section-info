@@ -21,24 +21,23 @@ async function getCodeSelectionInfo():Promise<void>{
 
         let matched_function_name = "undefined";
         for(let f of functions){
-            if(f.location.range._start._line < selection.start.line){
-                matched_function_name = f.name;
+            if( (f.location.range._start.line <= selection.start.line)
+            ){
+                matched_function_name = f.name;            
             }else{
                 break;
             }
         }
                 
         let copyText = 
-`
-file: ${active_file_path}
+`file: ${active_file_path}
 line: ${line_str}
 func: ${matched_function_name}
 cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0            
 code:
 \`\`\`
 ${vscode.window.activeTextEditor.document.getText(selection)}
-\`\`\`
-`;
+\`\`\``;
 
         console.log(copyText) ;
         

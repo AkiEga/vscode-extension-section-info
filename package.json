@@ -20,7 +20,14 @@
                 "command": "extension.getSelectionInfo",
                 "title": "Get selection info"
             }
-        ]
+        ],
+        "menus": {
+            "editor/context": [{
+                "command": "extension.getSelectionInfo",
+                "when": "editorHasSelection",
+                "group": "navigation"
+            }]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

@@ -3,7 +3,8 @@
     "displayName": "selection-info",
     "description": "",
     "version": "0.0.1",
-    "publisher": "akiega",
+    "publisher": "akiega1",
+    "repository": "https://AkiraEga@bitbucket.org/only_ega/section-info.git",
     "engines": {
         "vscode": "^1.23.0"
     },

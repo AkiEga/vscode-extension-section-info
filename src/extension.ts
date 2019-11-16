@@ -2,12 +2,22 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as ncp from "copy-paste";
 import { start } from 'repl';
 
-async function getCodeSelectionInfo():Promise<void>{
+interface OutputSectionConfig {
+    file_path:boolean,
+    line_num:boolean,
+    func_name:boolean,
+    open_vscode_cmd:boolean,
+    section:boolean,
+    section_type:string
+}
+
+async function getCodeSelectionInfo(config?:OutputSectionConfig):Promise<void>{
     let active_file_path:string = vscode.window.activeTextEditor.document.fileName;
     let active_file_path_for_vscode_URI = "file"+active_file_path.replace(/(c|C)\:/g,"").replace(/\\/g,"/");
-    let ncp = require("copy-paste");
+    
     let uri = vscode.window.activeTextEditor.document.uri;
     let symbol:Array<any> = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
     let functions = symbol.filter((elem, index, array)=>{
@@ -21,15 +31,42 @@ async function getCodeSelectionInfo():Promise<void>{
 
         let matched_function_name = "undefined";
         for(let f of functions){
-            if( (f.location.range._start.line <= selection.start.line)
-            ){
+            if(f.location.range._start.line <= selection.start.line){
                 matched_function_name = f.name;            
             }else{
                 break;
             }
         }
-                
-        let copyText = 
+        let copyText:string = "";
+        if(config){
+            if(config.file_path){
+                copyText += `file: ${active_file_path}\n`;
+            }
+            if(config.line_num){
+                copyText += `line: ${line_str}\n`;
+            }
+            if(config.func_name){
+                copyText += `func: ${matched_function_name}\n`;
+            }
+            if(config.open_vscode_cmd){
+                copyText += `cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0\n`
+            }
+            if(config.section){
+                if(config.section_type === "git"){
+                    copyText += 
+`code:
+\`\`\`
+${vscode.window.activeTextEditor.document.getText(selection)}
+\`\`\`\n`;                        
+                }else if(config.section_type === "jira"){
+                    copyText += 
+`{code}
+${vscode.window.activeTextEditor.document.getText(selection)}
+{code}\n`;
+                }
+            }
+        }else{
+            copyText = 
 `file: ${active_file_path}
 line: ${line_str}
 func: ${matched_function_name}
@@ -37,7 +74,8 @@ cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0
 code:
 \`\`\`
 ${vscode.window.activeTextEditor.document.getText(selection)}
-\`\`\``;
+\`\`\``;                        
+        }
 
         console.log(copyText) ;
         
@@ -52,7 +90,14 @@ ${vscode.window.activeTextEditor.document.getText(selection)}
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
+    let config:OutputSectionConfig = {
+        file_path: vscode.workspace.getConfiguration().get<boolean>("section-info.output.file-path"),
+        line_num: vscode.workspace.getConfiguration().get<boolean>("section-info.output.line-num"),
+        func_name: vscode.workspace.getConfiguration().get<boolean>("section-info.output.func-name"),
+        open_vscode_cmd: vscode.workspace.getConfiguration().get<boolean>("section-info.output.open-vscode-cmd"),
+        section: vscode.workspace.getConfiguration().get<boolean>("section-info.output.section"),
+        section_type: vscode.workspace.getConfiguration().get<string>("section-info.output.section-type"),
+    }
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "selection-info" is now active!');
@@ -63,9 +108,12 @@ export function activate(context: vscode.ExtensionContext) {
     let disposable = vscode.commands.registerCommand('extension.getSelectionInfo', () => {
         // The code you place here will be executed every time your command is executed
 
-
         // Display a message box to the user
-        getCodeSelectionInfo();
+        if(config){
+            getCodeSelectionInfo(config);
+        }else{
+            getCodeSelectionInfo();
+        }
     });
 
     context.subscriptions.push(disposable);

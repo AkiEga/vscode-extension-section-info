@@ -11,7 +11,7 @@ interface OutputSectionConfig {
     func_name:boolean,
     open_vscode_cmd:boolean,
     section:boolean,
-    section_type:string
+    section_md_style:string
 }
 
 async function getCodeSelectionInfo(config?:OutputSectionConfig):Promise<void>{
@@ -52,13 +52,13 @@ async function getCodeSelectionInfo(config?:OutputSectionConfig):Promise<void>{
                 copyText += `cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0\n`
             }
             if(config.section){
-                if(config.section_type === "git"){
+                if(config.section_md_style === "git"){
                     copyText += 
 `code:
 \`\`\`
 ${vscode.window.activeTextEditor.document.getText(selection)}
 \`\`\`\n`;                        
-                }else if(config.section_type === "jira"){
+                }else if(config.section_md_style === "jira"){
                     copyText += 
 `{code}
 ${vscode.window.activeTextEditor.document.getText(selection)}
@@ -96,7 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
         func_name: vscode.workspace.getConfiguration().get<boolean>("section-info.output.func-name"),
         open_vscode_cmd: vscode.workspace.getConfiguration().get<boolean>("section-info.output.open-vscode-cmd"),
         section: vscode.workspace.getConfiguration().get<boolean>("section-info.output.section"),
-        section_type: vscode.workspace.getConfiguration().get<string>("section-info.output.section-type"),
+        section_md_style: vscode.workspace.getConfiguration().get<string>("section-info.output.section-md-style"),
     }
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated

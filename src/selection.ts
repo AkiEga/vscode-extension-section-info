@@ -21,14 +21,14 @@ export default class selectionHandler{
 	}
 	genSelectionInfoText(selection:vscode.Selection):string{		
 		let active_file_path:string = vscode.window.activeTextEditor.document.uri.path;		
+		let relativePath:string = vscode.workspace.asRelativePath(active_file_path);		
 		let active_file_path_for_vscode_URI = "file"+active_file_path.replace(/(c|C)\:/g,"").replace(/\\/g,"/");				
 		let start_line:string = (selection.start.line +1).toString();
 		let end_line:string = (selection.end.line +1).toString();
-		let line_str:string = selection.isSingleLine?start_line:start_line+" - "+end_line;
+		let line_str:string = selection.isSingleLine?start_line:start_line+"-"+end_line;
 		let copyText:string = "";
 
 		if(this.config.file_path){
-			let relativePath:string = vscode.workspace.asRelativePath(active_file_path);
 			copyText += `file: ${relativePath}\n`;
 		}
 		if(this.config.line_num){
@@ -50,7 +50,7 @@ ${vscode.window.activeTextEditor.document.getText(selection)}
 \`\`\`\n`;                        
 			}else if(this.config.section_md_style === EN_SH_MD_STYLE.JIRA){
 					copyText += 
-`{code}
+`{code:title=file: ${relativePath}, line: ${line_str}}
 ${vscode.window.activeTextEditor.document.getText(selection)}
 {code}\n`;
 			}

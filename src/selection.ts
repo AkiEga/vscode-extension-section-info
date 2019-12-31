@@ -2,60 +2,48 @@ import * as vscode from 'vscode';
 import OutputSectionConfig, { EN_SH_MD_STYLE } from './config';
 import * as ncp from "copy-paste";
 import { activate } from './extension';
+import * as template from 'es6-template-strings';
+import { start } from 'repl';
 
 export default class selectionHandler{
 	config:OutputSectionConfig;
 	constructor(_config:OutputSectionConfig){
 		this.config = _config;
 	}
-	async getCodeSelectionInfo():Promise<void>{
-
-		let selection = vscode.window.activeTextEditor.selections[0];
-
-
-		ncp.copy(this.genSelectionInfoText(selection));
-
-		new Promise<void>((resolve)=>{
-			resolve();
-		});
-	}
-	genSelectionInfoText(selection:vscode.Selection):string{		
-		let active_file_path:string = vscode.window.activeTextEditor.document.uri.path;		
-		let relativePath:string = vscode.workspace.asRelativePath(active_file_path);		
-		let active_file_path_for_vscode_URI = "file"+active_file_path.replace(/(c|C)\:/g,"").replace(/\\/g,"/");				
+	public async getCodeSelectionInfo():Promise<void>{
+		let selection = vscode.window.activeTextEditor.selection;
+		// line
 		let start_line:string = (selection.start.line +1).toString();
 		let end_line:string = (selection.end.line +1).toString();
-		let line_str:string = selection.isSingleLine?start_line:start_line+"-"+end_line;
-		let copyText:string = "";
+		let line:string = selection.isSingleLine?start_line:start_line+"-"+end_line;
+		// file path
+		let fileFullPath:string = vscode.window.activeTextEditor.document.uri.path.replace(/\\/g, "/");		
+		let fileRelativePath:string = vscode.workspace.asRelativePath(fileFullPath);
+		let fileVscodePath:string = "";
+		let vscodeCmd:string = "cmd: ";
+		// cmd
+		if(process.platform==='win32'){ // for windows case
+			fileVscodePath = "vscode://file"+fileFullPath.replace(/(c|C)\:/g,"");
+			vscodeCmd += `start ${fileVscodePath}:${start_line}:0`;
+		}else if(process.platform==='darwin'){ // for mac os case
+			fileVscodePath = "vscode://file"+fileFullPath;
+			vscodeCmd += `start ${fileVscodePath}:${start_line}:0`;
+		}
+		// lang
+		let lang:string = vscode.window.activeTextEditor.document.languageId;
+		let func:string = await this.getFuncName(selection);		
+		let selectionText:string = vscode.window.activeTextEditor.document.getText(selection);
+		selectionText = " ".repeat(selection.start.character) + selectionText;
 
-		if(this.config.file_path){
-			copyText += `file: ${relativePath}\n`;
-		}
-		if(this.config.line_num){
-			copyText += `line: ${line_str}\n`;
-		}
-		if(this.config.func_name){			
-			copyText += `func: ${this.getFuncName(selection)}\n`;
-		}
-		if(this.config.open_vscode_cmd){
-			copyText += `cmd:  start vscode://${active_file_path_for_vscode_URI}:${start_line}:0\n`
-		}
-		if(this.config.section){
-			if(this.config.section_md_style === EN_SH_MD_STYLE.GITHUB){
-				let lang:string = vscode.window.activeTextEditor.document.languageId;
-				copyText += 
-`code:
-\`\`\`${lang}
-${vscode.window.activeTextEditor.document.getText(selection)}
-\`\`\`\n`;                        
-			}else if(this.config.section_md_style === EN_SH_MD_STYLE.JIRA){
-					copyText += 
-`{code:title=file: ${relativePath}, line: ${line_str}}
-${vscode.window.activeTextEditor.document.getText(selection)}
-{code}\n`;
-			}
-		}			
-		return copyText;
+		let selectedStyleFormat = await vscode.window.showQuickPick(this.config.formats);
+		let copyText:string = await template(selectedStyleFormat.format, {
+			vscodeCmd, fileRelativePath, line, lang, func, selectionText
+		});
+		ncp.copy(copyText);
+
+		return new Promise<void>((resolve)=>{
+			resolve();
+		});
 	}
 	private async getFuncName(selection:vscode.Selection):Promise<string>{
 		let uri = vscode.window.activeTextEditor.document.uri;

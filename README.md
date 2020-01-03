@@ -19,13 +19,13 @@ You can set the below item in settings.json
     ],
 ```
 
-- value for format styling
-	- fileRelativePath
-	- line
-	- func
-	- lang
-	- selectionText
-	- vscodeCmd
+- Variable for format styling
+	- `${fileRelativePath}`: relative path of the selected file
+	- `${line}`: selected line
+	- `${func}`: function has the selected area
+	- `${lang}`: programing language of the selected file
+	- `${selectionText}`: text of selected area
+	- `${vscodeCmd}`: command to access the selected area with vscode
 
 ### Sample
 - Sample1: for outputting git markdown style  

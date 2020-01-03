@@ -67,6 +67,7 @@ You can set the below item in settings.json
 		}
 	}
 	```
+	```
   
 ### Default setting
 If There is no setting like above, this extension set the below setting automatically.

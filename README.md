@@ -10,7 +10,7 @@ You can set the below item in settings.json
 "section-info.output.formats": [
         {
             "label": "github",
-            "format": "file: ${fileRelativePath}\nline:${line}code:\n```${lang}\n${selectionText}\n```\n"
+            "format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
         },
         {
             "label": "JIRA",
@@ -75,6 +75,6 @@ If There is no setting like above, this extension set the below setting automati
 ```json
 {
 	"label": "github",
-	"format": "file: ${fileRelativePath}\nline:${line}code:\n```${lang}\n${selectionText}\n```\n"
+	"format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
 }
 ```

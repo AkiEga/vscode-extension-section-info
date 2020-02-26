@@ -1,6 +1,6 @@
 {
-    "name": "selection-info",
-    "displayName": "selection-info",
+    "name": "quick-copy-as-markdown",
+    "displayName": "quick-copy-as-markdown",
     "description": "",
     "version": "0.14.0",
     "publisher": "akiega",
@@ -20,7 +20,7 @@
         "commands": [
             {
                 "command": "extension.getSelectionInfo",
-                "title": "Get selection info"
+                "title": "Copy selected code as markdown"
             }
         ],
         "menus": {

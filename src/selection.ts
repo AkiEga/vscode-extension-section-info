@@ -48,7 +48,15 @@ export default class selectionHandler{
 	private async getFuncName(selection:vscode.Selection):Promise<string>{
 		let uri = vscode.window.activeTextEditor.document.uri;
 		let matched_function_name = "undefined";		
-		let symbol:Array<any> = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
+		let symbol:Array<any>|undefined = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
+
+		// in a case to fail to load symbol provider
+		if(symbol === undefined){
+			return new Promise<string>((resolve)=>{
+				resolve("");
+			});
+		}
+
 		let function_symbol_kind_index:number = 11;
 		let functions = symbol.filter((elem, index, array)=>{
 			return (elem.kind == function_symbol_kind_index)

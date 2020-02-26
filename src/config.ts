@@ -24,7 +24,7 @@ export default class OutputSectionConfig{
 			this.formats = [
 				{
 					"label": "github",
-					"format": "file: ${fileRelativePath}\nline:${line}code:\n```${lang}\n${selectionText}\n```\n"
+					"format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
 				}
 			]
 		}

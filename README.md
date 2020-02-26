@@ -1,5 +1,7 @@
 # Features
-This extension support to copy selected section of c/c++ file to clipboard.
+This extension support to copy selected section information to clipboard.  
+  
+![demo.gif](./doc/image/demo.gif)
 
 ## Setting
 ### Detail info

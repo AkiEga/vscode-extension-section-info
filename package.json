@@ -2,7 +2,7 @@
     "name": "selection-info",
     "displayName": "selection-info",
     "description": "",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "publisher": "akiega1",
     "repository": "https://github.com/AkiEga/vscode-extension-section-info.git",
     "engines": {

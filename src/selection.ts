@@ -5,6 +5,8 @@ import { activate } from './extension';
 import * as template from 'es6-template-strings';
 import { start } from 'repl';
 
+import {GitInfo} from './gitInfo';
+
 export default class selectionHandler{
 	config:OutputSectionConfig;
 	constructor(_config:OutputSectionConfig){
@@ -21,6 +23,11 @@ export default class selectionHandler{
 		let fileRelativePath:string = vscode.workspace.asRelativePath(fileFullPath);
 		let fileVscodePath:string = "";
 		let vscodeCmd:string = "cmd: ";
+		let gitInfo:GitInfo = new GitInfo();
+		let gitBranchName:string = gitInfo.branch;
+		let gitHeadCommitSHA:string = gitInfo.headCommit.SHA;
+		let gitHeadCommitDate:string = gitInfo.headCommit.committerDate;
+
 		// cmd
 		if(process.platform==='win32'){ // for windows case
 			fileVscodePath = "vscode://file"+fileFullPath.replace(/(c|C)\:/g,"");
@@ -37,7 +44,7 @@ export default class selectionHandler{
 
 		let selectedStyleFormat = await vscode.window.showQuickPick(this.config.formats);
 		let copyText:string = await template(selectedStyleFormat.format, {
-			vscodeCmd, fileRelativePath, line, lang, func, selectionText
+			vscodeCmd, fileRelativePath, line, lang, func, selectionText, gitBranchName, gitHeadCommitSHA, gitHeadCommitDate
 		});
 		ncp.copy(copyText);
 
@@ -45,6 +52,7 @@ export default class selectionHandler{
 			resolve();
 		});
 	}
+	
 	private async getFuncName(selection:vscode.Selection):Promise<string>{
 		let uri = vscode.window.activeTextEditor.document.uri;
 		let matched_function_name = "undefined";		

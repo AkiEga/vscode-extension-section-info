@@ -12,13 +12,13 @@ You can set the below item in settings.json
 "section-info.output.formats": [
         {
             "label": "github",
-            "format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
+            "format": "file: ${fileRelativePath}\nline:${line}\ngit branch: ${gitBranchName}\ngit commit SHA: ${gitHeadCommitSHA}\ngit commit date: ${gitHeadCommitDate}\ncode:\n```${lang}\n${selectionText}\n```\n"
         },
         {
             "label": "JIRA",
             "format": "{code:title=file: ${fileRelativePath}, line:${line}}\n${selectionText}\n{code}\n"
         }
-    ],
+],
 ```
 
 - Variable for format styling
@@ -28,6 +28,9 @@ You can set the below item in settings.json
 	- `${lang}`: programing language of the selected file
 	- `${selectionText}`: text of selected area
 	- `${vscodeCmd}`: command to access the selected area with vscode
+	- `${gitBranchName}`: git current branch name
+	- `${gitHeadCommitSHA}`: git HEAD commit SHA
+	- `${gitHeadCommitDate}`: git HEAD commit date
 
 ### Sample
 - Sample1: for outputting git markdown style  

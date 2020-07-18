@@ -7,26 +7,35 @@
     "license": "MIT",
     "repository": "https://github.com/AkiEga/vscode-extension-section-info.git",
     "engines": {
-        "vscode": "^1.23.0"
+        "vscode": "^1.47.0"
     },
     "categories": [
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.getSelectionInfo"
+        "onCommand:extension.QuickCopyAsMd.copyToClipboard",
+        "onCommand:extension.QuickCopyAsMd.timeLineTrace"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.getSelectionInfo",
+                "command": "extension.QuickCopyAsMd.copyToClipboard",
                 "title": "Copy selected code as markdown"
+            },
+            {
+                "command": "extension.QuickCopyAsMd.enableTraceMode",
+                "title": "Enable a mode to trace code reading actions"
+            },
+            {
+                "command": "extension.QuickCopyAsMd.quickMarkInTraceMode",
+                "title": "Enable a mode to trace code reading actions"
             }
         ],
         "menus": {
             "editor/context": [
                 {
-                    "command": "extension.getSelectionInfo",
+                    "command": "extension.QuickCopyAsMd.copyToClipboard",
                     "when": "editorHasSelection",
                     "group": "navigation"
                 }

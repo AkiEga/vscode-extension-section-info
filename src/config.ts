@@ -16,17 +16,30 @@ export default class OutputSectionConfig{
 		this.formats = [];
 		this.initFromVscodeSetting();
 	}
-	initFromVscodeSetting(){		
+	private initFromVscodeSetting(){		
 		let formats:styleFormat[] = vscode.workspace.getConfiguration().get<styleFormat[]>("section-info.output.formats");
 		if(formats){
 			this.formats = formats;
-		}else{
-			this.formats = [
-				{
-					"label": "github",
-					"format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
-				}
-			]
+		}
+	}
+	public async getSeletedStyleFormat():Promise<styleFormat>{
+		let selectedStyleFormat:styleFormat;
+		if(this.formats.length === 0){
+			selectedStyleFormat = this.getDefaultFormatConfig();
+		}else if(this.formats.length === 1){
+			selectedStyleFormat = this.formats[0];			
+		}else if(this.formats.length > 2){			
+			selectedStyleFormat = await vscode.window.showQuickPick(this.formats);
+		}
+
+		return new Promise<styleFormat>((resolve)=>{
+			resolve(selectedStyleFormat)
+		});
+	}
+	public getDefaultFormatConfig():styleFormat{
+		return {
+			"label": "github",
+			"format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
 		}
 	}
 }

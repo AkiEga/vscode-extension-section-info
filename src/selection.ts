@@ -2,10 +2,7 @@
 import * as vscode from 'vscode';
 import {styleFormat} from './config';
 import OutputSectionConfig, { EN_SH_MD_STYLE } from './config';
-import * as ncp from "copy-paste";
-import { activate } from './extension';
 import * as template from 'es6-template-strings';
-import { start } from 'repl';
 
 import { GitInfo, GitCommitInfo } from './gitInfo';
 
@@ -64,42 +61,14 @@ export default class SelectionHandler{
 		let copyText:string = await template(selectedStyleFormat.format, {
 			vscodeCmd, fileRelativePath, line, lang, func, selectionText, gitBranchName, gitHeadCommitSHA, gitHeadCommitDate
 		});
-		ncp.copy(copyText);
+		await vscode.env.clipboard.writeText(copyText);
 
 		return new Promise<void>((resolve)=>{
 			resolve();
 		});
 	}
 	
-	private async getFuncName(selection:vscode.Selection):Promise<string>{
-		let uri = vscode.window.activeTextEditor.document.uri;
-		let matched_function_name = "undefined";		
-		let symbol:Array<any>|undefined = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
-
-		// in a case to fail to load symbol provider
-		if(symbol === undefined){
-			return new Promise<string>((resolve)=>{
-				resolve("");
-			});
-		}
-
-		let function_symbol_kind_index:number = 11;
-		let functions = symbol.filter((elem, index, array)=>{
-			return (elem.kind == function_symbol_kind_index)
-		})
-		for(let f of functions){
-			if(f.location.range._start.line <= selection.start.line){
-				matched_function_name = f.name;            
-			}else{
-				break;
-			}
-		}
-
-		return new Promise<string>((resolve)=>{
-			resolve(matched_function_name);
-		});
-	}
-	private async genSelectionInfo():Promise<SelectionInfo> {
+	public async genSelectionInfo():Promise<SelectionInfo> {
 		let selection = vscode.window.activeTextEditor.selection;
 		let selectionInfo:SelectionInfo = new SelectionInfo();
 
@@ -142,6 +111,35 @@ export default class SelectionHandler{
 
 		return new Promise<SelectionInfo>((resolve)=>{
 			resolve(selectionInfo);
+		});
+	}
+
+	private async getFuncName(selection:vscode.Selection):Promise<string>{
+		let uri = vscode.window.activeTextEditor.document.uri;
+		let matched_function_name = "undefined";		
+		let symbol:Array<any>|undefined = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
+
+		// in a case to fail to load symbol provider
+		if(symbol === undefined){
+			return new Promise<string>((resolve)=>{
+				resolve("");
+			});
+		}
+
+		let function_symbol_kind_index:number = 11;
+		let functions = symbol.filter((elem, index, array)=>{
+			return (elem.kind == function_symbol_kind_index)
+		})
+		for(let f of functions){
+			if(f.location.range._start.line <= selection.start.line){
+				matched_function_name = f.name;            
+			}else{
+				break;
+			}
+		}
+
+		return new Promise<string>((resolve)=>{
+			resolve(matched_function_name);
 		});
 	}
 }

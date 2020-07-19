@@ -6,6 +6,7 @@ import OutputSectionConfig from './config';
 //import * as ncp from "copy-paste";
 import { start } from 'repl';
 import SelectionHandler from './selection';
+import ReadingActionTracer from './readingActionTracer';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -14,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let config:OutputSectionConfig = new OutputSectionConfig();
     let sh:SelectionHandler = new SelectionHandler(config);
+    let rt:ReadingActionTracer = new ReadingActionTracer(sh);
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
@@ -25,13 +27,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('extension.QuickCopyAsMd.enableTraceMode', () => {
-            sh.getCodeSelectionInfo();
+            rt.enableTraceMode();
         })
     );
 
     context.subscriptions.push(
         vscode.commands.registerCommand('extension.QuickCopyAsMd.quickMarkInTraceMode', () => {
-            sh.getCodeSelectionInfo();
+            rt.quickMark();
         })
     );
 }

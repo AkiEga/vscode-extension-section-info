@@ -1,26 +1,52 @@
 import * as vscode from 'vscode';
 import SelectionHandler from './selection';
 import SelectionInfo from './selection';
-import { resolve } from 'url';
+import * as path from 'path'
 
 export default class ReadingActionTracer {
 	isTraceModeEnable: boolean = false;
 	traceLog:string = "";
 	selectionHander:SelectionHandler = null;
+	editor:vscode.TextEditor;
+	doc:vscode.TextDocument;
 	constructor(_selectionHandler:SelectionHandler){
 		this.selectionHander = _selectionHandler;
 	}
-	enableTraceMode():void{
+	async enableTraceMode():Promise<void>{
 		this.isTraceModeEnable = true;
 
-		return;
+		this.doc = await vscode.workspace.openTextDocument();		
+		let editorOption:vscode.TextDocumentShowOptions = {
+			preview: false,
+			viewColumn:vscode.ViewColumn.Beside,
+			preserveFocus: true
+		};
+
+		this.editor = await vscode.window.showTextDocument(this.doc, editorOption);
+
+		return new Promise<void>(resolve=>{
+			resolve();
+		})
 	}
 	async quickMark():Promise<void> {
 		let si = await this.selectionHander.genSelectionInfo();
 
-		console.log(`${si.selectedText.trim()} (file: ${si.fileRelativePath}, line: ${si.startLine}, func: )`);
+		let text:string = 
+`
+\`\`\`${si.language}
+${si.selectedText}
+\`\`\`
+(file: ${si.fileRelativePath}, line: ${si.startLine}, func: ${si.function})
 
-		return new Promise(resolve=>{
+`;
+
+		let endPos:vscode.Position 
+			= this.doc.positionAt(this.doc.getText().length);
+		this.editor.edit((editBuilder: vscode.TextEditorEdit) => {
+			editBuilder.insert(endPos, text);
+		})
+
+		return new Promise<void>(resolve=>{
 			resolve();
 		})
 	}	

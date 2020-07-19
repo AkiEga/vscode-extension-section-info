@@ -1,4 +1,7 @@
 # TODO
-- support custom text
+- Support Trace log view, which updates real time
 - 
+
 # Reference
+
+

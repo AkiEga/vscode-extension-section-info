@@ -1,16 +1,15 @@
 import * as vscode from 'vscode';
-import SelectionHandler from './selection';
-import SelectionInfo from './selection';
+import SelectionInfo from '../InfoParser/SelectionInfo';
 import * as path from 'path'
 
-export default class ReadingActionTracer {
+export default class ReadingActionHandler {
 	isTraceModeEnable: boolean = false;
 	traceLog:string = "";
-	selectionHander:SelectionHandler = null;
+	selectionInfo:SelectionInfo = null;
 	editor:vscode.TextEditor;
 	doc:vscode.TextDocument;
-	constructor(_selectionHandler:SelectionHandler){
-		this.selectionHander = _selectionHandler;
+	constructor(){
+		this.selectionInfo = new SelectionInfo();
 	}
 	async enableTraceMode():Promise<void>{
 		this.isTraceModeEnable = true;
@@ -29,7 +28,7 @@ export default class ReadingActionTracer {
 		})
 	}
 	async quickMark():Promise<void> {
-		let si = await this.selectionHander.AnalyzeSelection();
+		let si = await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
 
 		let text:string = 
 `
@@ -51,7 +50,7 @@ ${si.selectedText}
 		})
 	}
 	async showCallFlow():Promise<void> {
-		let si = await this.selectionHander.AnalyzeSelection();
+		let si = await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
 
 		let text:string = 
 `

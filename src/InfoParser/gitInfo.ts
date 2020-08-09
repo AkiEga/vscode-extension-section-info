@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as fileUtil from './fileUtil';
+import * as fileUtil from '../util/fileUtil';
 import {execSync} from 'child_process';
 import * as path from 'path';
 
@@ -24,13 +24,17 @@ export class GitInfo {
 		
 		if( this.IsGitExeExist() === true &&
 			fileUtil.IsFileExists(this.dotGitFolderPath) === true){
-			this.branch = this.gitCmd("symbolic-ref --short HEAD");
-			this.headCommit.SHA = this.gitCmd(`log -1 --pretty=format:"%H"`);					
-			this.headCommit.committerName = this.gitCmd(`log -1 --pretty=format:"%cn"`);
-			this.headCommit.committerDate = this.gitCmd(`log -1 --pretty=format:"%cd"`);
-			this.headCommit.comment = this.gitCmd(`log -1 --pretty=format:"%s"`);
+			this.Update();
 		}
 	}
+	public Update() {
+		this.branch = this.gitCmd("symbolic-ref --short HEAD");
+		this.headCommit.SHA = this.gitCmd(`log -1 --pretty=format:"%H"`);
+		this.headCommit.committerName = this.gitCmd(`log -1 --pretty=format:"%cn"`);
+		this.headCommit.committerDate = this.gitCmd(`log -1 --pretty=format:"%cd"`);
+		this.headCommit.comment = this.gitCmd(`log -1 --pretty=format:"%s"`);
+	}
+
 	private IsGitExeExist():boolean {
 		let gitVersionCmdRet:string = execSync("git --version").toString().trim();
 

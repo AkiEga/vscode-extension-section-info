@@ -38,7 +38,7 @@ export default class OutputSectionConfig{
 	}
 	public getDefaultFormatConfig():styleFormat{
 		return {
-			"label": "github",
+			"label": "default(github markdown style)",
 			"format": "file: ${fileRelativePath}\nline:${line}\ncode:\n```${lang}\n${selectionText}\n```\n"
 		}
 	}

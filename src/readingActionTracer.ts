@@ -29,7 +29,7 @@ export default class ReadingActionTracer {
 		})
 	}
 	async quickMark():Promise<void> {
-		let si = await this.selectionHander.genSelectionInfo();
+		let si = await this.selectionHander.AnalyzeSelection();
 
 		let text:string = 
 `
@@ -49,6 +49,28 @@ ${si.selectedText}
 		return new Promise<void>(resolve=>{
 			resolve();
 		})
-	}	
+	}
+	async showCallFlow():Promise<void> {
+		let si = await this.selectionHander.AnalyzeSelection();
+
+		let text:string = 
+`
+\`\`\`${si.language}
+${si.selectedText}
+\`\`\`
+(file: ${si.fileRelativePath}, line: ${si.startLine}, func: ${si.function})
+
+`;
+
+		let endPos:vscode.Position 
+			= this.doc.positionAt(this.doc.getText().length);
+		this.editor.edit((editBuilder: vscode.TextEditorEdit) => {
+			editBuilder.insert(endPos, text);
+		})
+
+		return new Promise<void>(resolve=>{
+			resolve();
+		})
+	}
 
 }

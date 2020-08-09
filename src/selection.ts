@@ -44,9 +44,10 @@ export default class SelectionHandler{
 		this.config = _config;
 	}
 	public async getCodeSelectionInfo():Promise<void>{
-		let selectionInfo:SelectionInfo = await this.genSelectionInfo();
+		let selectionInfo:SelectionInfo = await this.AnalyzeSelection();
 
 		let vscodeCmd:string = selectionInfo.vscodeCmd;
+		let fileFullPath:string = selectionInfo.fileFullPath;
 		let fileRelativePath:string = selectionInfo.fileRelativePath;
 		let line:string = selectionInfo.lineStr;
 		let lang:string = selectionInfo.language;
@@ -58,8 +59,9 @@ export default class SelectionHandler{
 
 		let selectedStyleFormat:styleFormat = await this.config.getSeletedStyleFormat();		
 
+		// assigned templates with analyzed results
 		let copyText:string = await template(selectedStyleFormat.format, {
-			vscodeCmd, fileRelativePath, line, lang, func, selectionText, gitBranchName, gitHeadCommitSHA, gitHeadCommitDate
+			vscodeCmd, fileFullPath, fileRelativePath, line, lang, func, selectionText, gitBranchName, gitHeadCommitSHA, gitHeadCommitDate
 		});
 		await vscode.env.clipboard.writeText(copyText);
 
@@ -68,7 +70,7 @@ export default class SelectionHandler{
 		});
 	}
 	
-	public async genSelectionInfo():Promise<SelectionInfo> {
+	public async AnalyzeSelection():Promise<SelectionInfo> {
 		let selection = vscode.window.activeTextEditor.selection;
 		let selectionInfo:SelectionInfo = new SelectionInfo();
 
@@ -116,7 +118,7 @@ export default class SelectionHandler{
 
 	private async getFuncName(selection:vscode.Selection):Promise<string>{
 		let uri = vscode.window.activeTextEditor.document.uri;
-		let matched_function_name = "undefined";		
+		let matched_func:any = null;
 		let symbol:Array<any>|undefined = <Array<any>> await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider",uri);
 
 		// in a case to fail to load symbol provider
@@ -132,14 +134,32 @@ export default class SelectionHandler{
 		})
 		for(let f of functions){
 			if(f.location.range._start.line <= selection.start.line){
-				matched_function_name = f.name;            
+				matched_func = f;
 			}else{
 				break;
 			}
 		}
+		// NOTE: test code for using call tree
+		// this.GetThisFuncRef(uri, matched_func.location.range._start);
 
 		return new Promise<string>((resolve)=>{
-			resolve(matched_function_name);
+			resolve(matched_func.name);
+		});
+	}
+	private async GetThisFuncRef(uri, pos): Promise<any[]>{
+		let ref:Array<any>|undefined = <Array<any>> await vscode.commands.executeCommand("vscode.executeReferenceProvider",uri, pos);
+		let ref_results = [];
+		for(let r of ref){
+			let refed_range:vscode.Range 
+				= new vscode.Range(
+					new vscode.Position(r.range.start.line, 0), 
+					new vscode.Position(r.range.end.line+1, 0));
+			let refed_text = vscode.window.activeTextEditor.document.getText(refed_range);
+			console.log(`${refed_text}(file: ${uri.fsPath}, line: ${refed_range.start.line})`);
+			ref_results.push(ref_results);
+		}
+		return new Promise<any[]>((resolve)=>{
+			resolve(ref_results);
 		});
 	}
 }

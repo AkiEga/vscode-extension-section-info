@@ -7,26 +7,41 @@
     "license": "MIT",
     "repository": "https://github.com/AkiEga/vscode-extension-section-info.git",
     "engines": {
-        "vscode": "^1.23.0"
+        "vscode": "^1.47.0"
     },
     "categories": [
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.getSelectionInfo"
+        "onStartupFinished",
+        "onCommand:extension.QuickCopyAsMd.copyToClipboard",
+        "onCommand:extension.QuickCopyAsMd.timeLineTrace"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.getSelectionInfo",
-                "title": "Copy selected code as markdown"
+                "command": "extension.QuickCopyAsMd.copyToClipboard",
+                "title": "Quick copy as markdown: Copy selected code as markdown"
+            },
+            {
+                "command": "extension.QuickCopyAsMd.enableTraceMode",
+                "title": "Quick copy as markdown: Enable a mode to trace code reading actions"
+            },
+            {
+                "command": "extension.QuickCopyAsMd.quickMarkInTraceMode",
+                "title": "Quick copy as markdown: Quick mark"
             }
         ],
         "menus": {
             "editor/context": [
                 {
-                    "command": "extension.getSelectionInfo",
+                    "command": "extension.QuickCopyAsMd.copyToClipboard",
+                    "when": "editorHasSelection",
+                    "group": "navigation"
+                },
+                {
+                    "command": "extension.QuickCopyAsMd.quickMarkInTraceMode",
                     "when": "editorHasSelection",
                     "group": "navigation"
                 }
@@ -48,7 +63,6 @@
         "vscode": "^1.1.18"
     },
     "dependencies": {
-        "copy-paste": "^1.3.0",
         "es6-template-strings": "^2.0.1",
         "npm": "^6.14.6"
     }

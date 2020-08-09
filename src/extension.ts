@@ -3,8 +3,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import OutputSectionConfig from './config/config';
-//import * as ncp from "copy-paste";
-import { start } from 'repl';
 import SelectionHandler from './actionHandler/selectionHandler';
 import ReadingActionHandler from './actionHandler/readingActionHandler';
 

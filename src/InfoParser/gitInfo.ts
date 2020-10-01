@@ -22,8 +22,8 @@ export class GitInfo {
 		this.dotGitFolderPath = path.join(this.workspaceRootDirPath, ".git");
 		this.headCommit = {SHA:"", comment: "", committerDate: "", committerName: ""};
 		
-		if( this.IsGitExeExist() === true &&
-			fileUtil.IsFileExists(this.dotGitFolderPath) === true){
+		if( GitInfo.IsGitExeExist() === true &&
+			GitInfo.IsDotGitDirExists() === true){
 			this.Update();
 		}
 	}
@@ -34,8 +34,15 @@ export class GitInfo {
 		this.headCommit.committerDate = this.gitCmd(`log -1 --pretty=format:"%cd"`);
 		this.headCommit.comment = this.gitCmd(`log -1 --pretty=format:"%s"`);
 	}
-
-	private IsGitExeExist():boolean {
+	public static CanGitUse():boolean {
+		if( GitInfo.IsGitExeExist() === true &&
+			GitInfo.IsDotGitDirExists() === true){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	public static IsGitExeExist():boolean {
 		let gitVersionCmdRet:string = execSync("git --version").toString().trim();
 
 		if(gitVersionCmdRet.match(/git version/) === null){
@@ -43,6 +50,10 @@ export class GitInfo {
 		}else{
 			return true;
 		}
+	}
+	public static IsDotGitDirExists():boolean {
+		let dotGitFolderPath = path.join(vscode.workspace.rootPath, ".git");
+		return fileUtil.IsFileExists(dotGitFolderPath);
 	}
 	private gitCmd(gitCmdOption:string):string {
 		let ret:string = "";

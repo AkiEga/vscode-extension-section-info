@@ -14,11 +14,17 @@ export default class SelectionHandler{
 	constructor(_config:OutputSectionConfig){
 		this.config = _config;
 		this.selectionInfo = new SelectionInfo();
-		this.gitInfo = new GitInfo();
+		if(GitInfo.CanGitUse()){
+			this.gitInfo = new GitInfo();
+		}else{
+			this.gitInfo = null;
+		}
 	}
 	public async CopyFromSelectionInfo():Promise<void>{
 		await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
-		this.gitInfo.Update();
+		if(this.gitInfo!==null){
+			this.gitInfo.Update();
+		}
 
 		let vscodeCmd:string = this.selectionInfo.vscodeCmd;
 		let fileFullPath:string = this.selectionInfo.fileFullPath;
@@ -27,9 +33,9 @@ export default class SelectionHandler{
 		let lang:string = this.selectionInfo.language;
 		let func:string = this.selectionInfo.function;
 		let selectionText:string = this.selectionInfo.selectedText;
-		let gitBranchName:string = this.gitInfo.branch;
-		let gitHeadCommitSHA:string = this.gitInfo.headCommit.SHA;
-		let gitHeadCommitDate:string = this.gitInfo.headCommit.committerDate;
+		let gitBranchName:string = this.gitInfo===null?"":this.gitInfo.branch;
+		let gitHeadCommitSHA:string = this.gitInfo===null?"":this.gitInfo.headCommit.SHA;
+		let gitHeadCommitDate:string = this.gitInfo===null?"":this.gitInfo.headCommit.committerDate;
 		let selectedStyleFormat:styleFormat = await this.config.getSeletedStyleFormat();		
 
 		// assigned templates with analyzed results

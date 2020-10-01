@@ -49,7 +49,7 @@
         }
     },
     "scripts": {
-        "vscode:publish": "$pat = cat ./PersonalAccessToken.txt; vsce publish minor -p $pat --yarn",
+        "vscode:publish": "vsce publish minor -p $(cat ./PersonalAccessToken.txt) --yarn",
         "vscode:prepublish": "yarn run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",

@@ -2,7 +2,7 @@
     "name": "quick-copy-as-markdown",
     "displayName": "quick-copy-as-markdown",
     "description": "",
-    "version": "0.20.0",
+    "version": "0.21.0",
     "publisher": "akiega",
     "license": "MIT",
     "repository": "https://github.com/AkiEga/vscode-extension-section-info.git",
@@ -22,11 +22,11 @@
         "configuration": {
             "title": "quick-copy-as-markdown",
             "properties": {
-              "section-info.output.formats": {
-                "type": "array",
-                "default": [],
-                "description": "format for section info\nDetail info: https://github.com/AkiEga/vscode-extension-section-info"
-              }
+                "section-info.output.formats": {
+                    "type": "array",
+                    "default": [],
+                    "description": "format for section info\nDetail info: https://github.com/AkiEga/vscode-extension-section-info"
+                }
             }
         },
         "commands": [

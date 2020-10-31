@@ -1,3 +1,4 @@
+import { SvnInfo } from './../InfoParser/svnInfo';
 //import { SelectionInfo } from './selection';
 import * as vscode from 'vscode';
 import {styleFormat} from '../config/config';
@@ -11,6 +12,7 @@ export default class SelectionHandler{
 	config:OutputSectionConfig;
 	selectionInfo:SelectionInfo;
 	gitInfo:GitInfo;
+	svnInfo:SvnInfo;
 	constructor(_config:OutputSectionConfig){
 		this.config = _config;
 		this.selectionInfo = new SelectionInfo();
@@ -19,6 +21,7 @@ export default class SelectionHandler{
 		}else{
 			this.gitInfo = null;
 		}
+		this.svnInfo = new SvnInfo();
 	}
 	public async CopyFromSelectionInfo():Promise<void>{
 		await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
@@ -37,10 +40,27 @@ export default class SelectionHandler{
 		let gitHeadCommitSHA:string = this.gitInfo===null?"":this.gitInfo.headCommit.SHA;
 		let gitHeadCommitDate:string = this.gitInfo===null?"":this.gitInfo.headCommit.committerDate;
 		let selectedStyleFormat:styleFormat = await this.config.getSeletedStyleFormat();		
+		let svnRev:number = this.svnInfo.GetRevsionNum(this.selectionInfo.fileFullPath);
+		let svnUrl:number = this.svnInfo.GetUrl(this.selectionInfo.fileFullPath);
+		
+		let allParam = [
+			vscodeCmd, 
+			fileFullPath, fileRelativePath, 
+			line, lang, func, 
+			selectionText, 
+			gitBranchName, gitHeadCommitSHA, gitHeadCommitDate,
+			svnRev, svnUrl
+		];
+		let allParamStr = allParam.join(",\n").toString()
 
 		// assigned templates with analyzed results
 		let copyText:string = await template(selectedStyleFormat.format, {
-			vscodeCmd, fileFullPath, fileRelativePath, line, lang, func, selectionText, gitBranchName, gitHeadCommitSHA, gitHeadCommitDate
+			vscodeCmd, 
+			fileFullPath, fileRelativePath, 
+			line, lang, func, 
+			selectionText, 
+			gitBranchName, gitHeadCommitSHA, gitHeadCommitDate,
+			svnRev, svnUrl, allParamStr
 		});
 		await vscode.env.clipboard.writeText(copyText);
 		console.log(`Now copied! Selected Style Format: "${selectedStyleFormat.label}".`);

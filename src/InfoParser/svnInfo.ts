@@ -36,8 +36,13 @@ export class SvnInfo {
 		// this.headCommit.rev = this.svnCmd(`info --show-item revision`);
 	}
 
-	public GetRevsion(filePath:string):number{
+	public GetRevsionNum(filePath:string):number{
 		let rev:number = Number(this.svnCmd(`info --show-item revision ${filePath}`));
+
+		return rev;
+	}
+	public GetUrl(filePath:string):string{
+		let rev:string = this.svnCmd(`info --show-item url ${filePath}`);
 
 		return rev;
 	}

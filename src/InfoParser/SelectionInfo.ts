@@ -41,7 +41,7 @@ export default class SelectionInfo {
 
 		// file path
 		this.fileFullPath
-			= vscode.window.activeTextEditor.document.uri.path.replace(/\\/g, "/");
+			= vscode.window.activeTextEditor.document.uri.fsPath.replace(/\\/g, "/");
 		this.fileRelativePath
 			= vscode.workspace.asRelativePath(this.fileFullPath);
 

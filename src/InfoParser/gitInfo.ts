@@ -34,7 +34,13 @@ export class GitInfo {
 		this.headCommit.committerDate = this.gitCmd(`log -1 --pretty=format:"%cd"`);
 		this.headCommit.comment = this.gitCmd(`log -1 --pretty=format:"%s"`);
 	}
-	public static CanGitUse():boolean {
+	public GetUrl(filePath:string):string{
+		let ret:string = "";
+		let cmd_result:string = this.gitCmd(`config --get remote.origin.url`);
+		ret = cmd_result.replace(/^(.*)(\.git)$/g,"$0");
+		return ret;
+	}
+	public static CanUse():boolean {
 		if( GitInfo.IsGitExeExist() === true &&
 			GitInfo.IsDotGitDirExists() === true){
 			return true;

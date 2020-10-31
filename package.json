@@ -19,6 +19,16 @@
     ],
     "main": "./out/extension",
     "contributes": {
+        "configuration": {
+            "title": "quick-copy-as-markdown",
+            "properties": {
+              "section-info.output.formats": {
+                "type": "array",
+                "default": [],
+                "description": "format for section info\nDetail info: https://github.com/AkiEga/vscode-extension-section-info"
+              }
+            }
+        },
         "commands": [
             {
                 "command": "extension.QuickCopyAsMd.copyToClipboard",

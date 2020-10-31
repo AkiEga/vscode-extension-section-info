@@ -36,7 +36,7 @@ export class SvnInfo {
 		// this.headCommit.rev = this.svnCmd(`info --show-item revision`);
 	}
 
-	public GetRevsionNum(filePath:string):number{
+	public GetRev(filePath:string):number{
 		let rev:number = Number(this.svnCmd(`info --show-item revision ${filePath}`));
 
 		return rev;
@@ -46,7 +46,10 @@ export class SvnInfo {
 
 		return rev;
 	}
-
+	public static CanUse():boolean{
+		let ret:boolean = true;
+		return ret;
+	}
 	private IsSvnExeExist():boolean {
 		let cmdRet:string = execSync("svn --version").toString().trim();
 

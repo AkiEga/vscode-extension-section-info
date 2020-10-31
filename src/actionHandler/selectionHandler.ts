@@ -41,7 +41,7 @@ export default class SelectionHandler{
 		let gitHeadCommitDate:string = this.gitInfo===null?"":this.gitInfo.headCommit.committerDate;
 		let selectedStyleFormat:styleFormat = await this.config.getSeletedStyleFormat();		
 		let svnRev:number = this.svnInfo.GetRevsionNum(this.selectionInfo.fileFullPath);
-		let svnUrl:number = this.svnInfo.GetUrl(this.selectionInfo.fileFullPath);
+		let svnUrl:string = this.svnInfo.GetUrl(this.selectionInfo.fileFullPath);
 		
 		let allParam = [
 			vscodeCmd, 

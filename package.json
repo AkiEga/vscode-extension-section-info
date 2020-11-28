@@ -49,11 +49,6 @@
                     "command": "extension.QuickCopyAsMd.copyToClipboard",
                     "when": "editorHasSelection",
                     "group": "navigation"
-                },
-                {
-                    "command": "extension.QuickCopyAsMd.quickMarkInTraceMode",
-                    "when": "editorHasSelection",
-                    "group": "navigation"
                 }
             ]
         }

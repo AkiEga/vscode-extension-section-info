@@ -51,8 +51,8 @@ export default class SelectionHandler{
 		let gitHeadCommitDate:string = "";
 		let gitUrl:string = "";
 		// ## svn
-		let svnRev:number = this.svnInfo.GetRev(this.selectionInfo.fileFullPath);
-		let svnUrl:string = this.svnInfo.GetUrl(this.selectionInfo.fileFullPath);
+		let svnRev:number = -1;
+		let svnUrl:string = "";
 		// ## common		
 		let repoType:string=this.repoType;
 		let repoVer:string="";
@@ -67,6 +67,8 @@ export default class SelectionHandler{
 				repoUrl = gitUrl;
 				break;
 			case "svn":
+				svnRev = this.svnInfo.GetRev(this.selectionInfo.fileFullPath);
+				svnUrl = this.svnInfo.GetUrl(this.selectionInfo.fileFullPath);
 				repoVer = svnRev.toString();
 				repoUrl = svnUrl;
 				break;

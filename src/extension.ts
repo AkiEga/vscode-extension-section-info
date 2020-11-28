@@ -23,17 +23,17 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('extension.QuickCopyAsMd.enableTraceMode', () => {
-            rt.enableTraceMode();
-        })
-    );
+    // context.subscriptions.push(
+    //     vscode.commands.registerCommand('extension.QuickCopyAsMd.enableTraceMode', () => {
+    //         rt.enableTraceMode();
+    //     })
+    // );
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('extension.QuickCopyAsMd.quickMarkInTraceMode', () => {
-            rt.quickMark();
-        })
-    );
+    // context.subscriptions.push(
+    //     vscode.commands.registerCommand('extension.QuickCopyAsMd.quickMarkInTraceMode', () => {
+    //         rt.quickMark();
+    //     })
+    // );
 }
 
 // this method is called when your extension is deactivated

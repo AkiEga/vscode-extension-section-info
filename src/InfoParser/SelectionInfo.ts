@@ -74,7 +74,13 @@ export default class SelectionInfo {
 	private async getFuncName(selection: vscode.Selection): Promise<string> {
 		let uri = vscode.window.activeTextEditor.document.uri;
 		let matched_func: any = null;
-		let symbol: Array<any> | undefined = <Array<any>>await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider", uri);
+		let symbol: Array<any> | undefined;
+		try{
+			symbol 
+				= <Array<any>>await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider", uri);
+		}catch(e:any){
+			console.log(e);
+		}
 
 		// in a case to fail to load symbol provider
 		if (symbol === undefined) {

@@ -17,8 +17,16 @@
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "npm: watch",
-            "console": "integratedTerminal",
+            "preLaunchTask": "watch",
+            "smartStep": true,
+            "presentation": {
+                "hidden": false,
+                "group": "",
+                "order": 1
+            },
+            "windows": {
+                "internalConsoleOptions": "openOnFirstSessionStart"
+            },
             "internalConsoleOptions": "openOnFirstSessionStart"
         },
         {

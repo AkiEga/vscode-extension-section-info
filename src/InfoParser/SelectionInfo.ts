@@ -73,11 +73,13 @@ export default class SelectionInfo {
 
 	private async getFuncName(selection: vscode.Selection): Promise<string> {
 		let uri = vscode.window.activeTextEditor.document.uri;
-		let matched_func: any = null;
-		let symbol: Array<any> | undefined;
+		let matched_func_name: string = "";
+		let symbol: Array<vscode.SymbolInformation> | undefined;
+		let refFuncLoc: Array<vscode.Location> = [];
 		try{
 			symbol 
 				= <Array<any>>await vscode.commands.executeCommand("vscode.executeDocumentSymbolProvider", uri);
+			// refFuncLoc = <vscode.Location[]>await vscode.commands.executeCommand("vscode.executeReferenceProvider", uri, selection.start);
 		}catch(e:any){
 			console.log(e);
 		}
@@ -94,8 +96,8 @@ export default class SelectionInfo {
 			return (elem.kind == function_symbol_kind_index);
 		});
 		for (let f of functions) {
-			if (f.location.range._start.line <= selection.start.line) {
-				matched_func = f;
+			if (f.location.range.start.line <= selection.start.line) {
+				matched_func_name = f.name;
 			}
 			else {
 				break;
@@ -104,7 +106,7 @@ export default class SelectionInfo {
 		// NOTE: test code for using call tree
 		// this.GetThisFuncRef(uri, matched_func.location.range._start);
 		return new Promise<string>((resolve) => {
-			resolve(matched_func.name);
+			resolve(matched_func_name);
 		});
 	}
 	private async GetThisFuncRef(uri, pos): Promise<any[]> {

@@ -27,49 +27,27 @@ export default class ReadingActionHandler {
 			resolve();
 		})
 	}
-	async quickMark():Promise<void> {
-		let si = await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
-
-		let text:string = 
-`
-\`\`\`${si.language}
-${si.selectedText}
-\`\`\`
-(file: ${si.fileRelativePath}, line: ${si.startLine}, func: ${si.function})
-
-`;
-
-		let endPos:vscode.Position 
-			= this.doc.positionAt(this.doc.getText().length);
-		this.editor.edit((editBuilder: vscode.TextEditorEdit) => {
-			editBuilder.insert(endPos, text);
-		})
-
-		return new Promise<void>(resolve=>{
-			resolve();
-		})
-	}
 	async showCallFlow():Promise<void> {
-		let si = await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
+// 		let si = await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
 
-		let text:string = 
-`
-\`\`\`${si.language}
-${si.selectedText}
-\`\`\`
-(file: ${si.fileRelativePath}, line: ${si.startLine}, func: ${si.function})
+// 		let text:string = 
+// `
+// \`\`\`${si.language}
+// ${si.selectedText}
+// \`\`\`
+// (file: ${si.fileRelativePath}, line: ${si.startLine}, func: ${si.function})
 
-`;
+// `;
 
-		let endPos:vscode.Position 
-			= this.doc.positionAt(this.doc.getText().length);
-		this.editor.edit((editBuilder: vscode.TextEditorEdit) => {
-			editBuilder.insert(endPos, text);
-		})
+// 		let endPos:vscode.Position 
+// 			= this.doc.positionAt(this.doc.getText().length);
+// 		this.editor.edit((editBuilder: vscode.TextEditorEdit) => {
+// 			editBuilder.insert(endPos, text);
+// 		})
 
-		return new Promise<void>(resolve=>{
-			resolve();
-		})
+// 		return new Promise<void>(resolve=>{
+// 			resolve();
+// 		})
 	}
 
 }

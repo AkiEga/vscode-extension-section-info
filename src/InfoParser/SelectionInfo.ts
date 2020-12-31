@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { styleFormat } from '../config/config';
 
 export default class SelectionInfo {
 	// line
@@ -28,42 +29,75 @@ export default class SelectionInfo {
 		this.function = "";
 		this.language = "";
 	}
-	public async Parse(selection: vscode.Selection): Promise<SelectionInfo> {
+	public async Parse(selection: vscode.Selection, matchedSymbols:RegExpMatchArray): Promise<SelectionInfo> {
 		// line
-		this.startLine = (selection.start.line + 1).toString();
-		this.endLine = (selection.end.line + 1).toString();
-		if (selection.isSingleLine) {
-			this.lineStr = this.startLine;
-		}
-		else {
-			this.lineStr = `${this.startLine}-${this.endLine}`;
+		if(matchedSymbols.includes("${line}")){
+			this.startLine = (selection.start.line + 1).toString();
+			this.endLine = (selection.end.line + 1).toString();
+			if (selection.isSingleLine) {
+				this.lineStr = this.startLine;
+			}
+			else {
+				this.lineStr = `${this.startLine}-${this.endLine}`;
+			}
 		}
 
-		// file path
+		// file path		
 		this.fileFullPath
 			= vscode.window.activeTextEditor.document.uri.fsPath.replace(/\\/g, "/");
-		this.fileRelativePath
-			= vscode.workspace.asRelativePath(this.fileFullPath);
+
+		if(matchedSymbols.includes("${fileRelativePath}")){
+			this.fileRelativePath
+				= vscode.workspace.asRelativePath(this.fileFullPath);
+		}
 
 		// cmd
-		if (process.platform === 'win32') { // for windows case
-			this.fileVscodePath
-				= `vscode://file/${this.fileFullPath.replace(/(c|C)\:/g, "")}`;
-			this.vscodeCmd
-				= `cmd: start ${this.fileVscodePath}:${this.startLine}:0`;
-		}
-		else if (process.platform === 'darwin') { // for mac os case
-			this.fileVscodePath
-				= `vscode://file/${this.fileFullPath}`;
-			this.vscodeCmd
-				= `cmd: code ${this.fileVscodePath}:${this.startLine}:0`;
+		if(matchedSymbols.includes("${vscodeCmd}")){
+			if (process.platform === 'win32') { // for windows case
+				this.fileVscodePath
+					= `vscode://file/${this.fileFullPath.replace(/(c|C)\:/g, "")}`;
+				this.vscodeCmd
+					= `cmd: start ${this.fileVscodePath}:${this.startLine}:0`;
+			}
+			else if (process.platform === 'darwin') { // for mac os case
+				this.fileVscodePath
+					= `vscode://file/${this.fileFullPath}`;
+				this.vscodeCmd
+					= `cmd: code ${this.fileVscodePath}:${this.startLine}:0`;
+			}
 		}
 
 		// lang
-		this.language = vscode.window.activeTextEditor.document.languageId;
-		this.function = await this.getFuncName(selection);
-		this.selectedText = vscode.window.activeTextEditor.document.getText(selection);
-		this.selectedText = " ".repeat(selection.start.character) + this.selectedText;
+		if(matchedSymbols.includes("${lang}")){
+			this.language = vscode.window.activeTextEditor.document.languageId;
+		}
+
+		// function
+		if(matchedSymbols.includes("${func}")){
+			this.function = await this.getFuncName(selection);
+		}
+
+		// selectionText
+		if(matchedSymbols.includes("${selectionText}")){
+			this.selectedText = vscode.window.activeTextEditor.document.getText(selection);
+			this.selectedText = " ".repeat(selection.start.character) + this.selectedText;
+			// let tempText:string = vscode.window.activeTextEditor.document.getText(selection);
+            //     tempText = " ".repeat(selection.start.character) + tempText;        
+            //     let tempText2:string ="";
+            //     // remove front spaces of line 
+            //     //  count front spaces
+            //     let space_num_max:number;
+            //     for(let l in tempText.split("\n")){
+			// 		let space_num:number = 0;
+            //       	for(let i=0;i<l.length;i++){
+			// 			if(l[i].match(" ")){
+			// 				space_num 
+			// 			}
+			// 	  	}
+                  
+            //       this.selectedText += l
+            //     }
+		}
 
 		return new Promise<SelectionInfo>((resolve) => {
 			resolve(this);

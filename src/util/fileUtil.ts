@@ -1,4 +1,6 @@
+import { exec } from 'child_process';
 import * as fs from 'fs';
+
 
 export function IsFileExists(filePath:string){
 	try{
@@ -10,4 +12,21 @@ export function IsFileExists(filePath:string){
 		}
 	}
 	return false;
+}
+
+export function CanCmdExec(cmdStr:string):boolean {
+	let ret:boolean;
+	try{
+		exec(cmdStr, (error) => {
+			if ( error instanceof Error) {
+				console.error(error);
+				throw Error;
+			} else {
+				ret = true;
+			}
+		})
+	}catch(e){
+		ret = false;
+	}
+	return ret;
 }

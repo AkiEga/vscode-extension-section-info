@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
-import {execSync} from 'child_process';
+import {exec, execSync} from 'child_process';
 import * as path from 'path';
 
 export interface GitCommitInfo {
@@ -17,15 +17,20 @@ export class GitInfo {
 	branch:string;
 	headCommit:GitCommitInfo;
 	tag?:string;
+	static CreateGitInfo():GitInfo {
+		if( fileUtil.CanCmdExec("git --version") === true &&
+			GitInfo.IsDotGitDirExists() === true){
+			return new GitInfo();
+		}else{
+			return null;
+		}
+	}
 	constructor(){
-		this.workspaceRootDirPath = vscode.workspace.rootPath;
+		this.workspaceRootDirPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
 		this.dotGitFolderPath = path.join(this.workspaceRootDirPath, ".git");
 		this.headCommit = {SHA:"", comment: "", committerDate: "", committerName: ""};
 		
-		if( GitInfo.IsGitExeExist() === true &&
-			GitInfo.IsDotGitDirExists() === true){
-			this.Update();
-		}
+		this.Update();
 	}
 	public Update() {
 		this.branch = this.gitCmd("symbolic-ref --short HEAD");
@@ -34,32 +39,23 @@ export class GitInfo {
 		this.headCommit.committerDate = this.gitCmd(`log -1 --pretty=format:"%cd"`);
 		this.headCommit.comment = this.gitCmd(`log -1 --pretty=format:"%s"`);
 	}
-	public GetUrl(filePath:string):string{
+	public GetUrl(fileRelativePath:string):string{
 		let ret:string = "";
 		let cmd_result:string = this.gitCmd(`config --get remote.origin.url`);
 		ret = cmd_result.replace(/^(.*)(\.git)$/g,"$0");
+		ret = `${ret}/blob/${this.branch}/${fileRelativePath}`
 		return ret;
 	}
-	public static CanUse():boolean {
-		if( GitInfo.IsGitExeExist() === true &&
-			GitInfo.IsDotGitDirExists() === true){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	public static IsGitExeExist():boolean {
-		let gitVersionCmdRet:string = execSync("git --version").toString().trim();
-
-		if(gitVersionCmdRet.match(/git version/) === null){
-			return false;
-		}else{
-			return true;
-		}
-	}
 	public static IsDotGitDirExists():boolean {
-		let dotGitFolderPath = path.join(vscode.workspace.rootPath, ".git");
-		return fileUtil.IsFileExists(dotGitFolderPath);
+		let ret:boolean = false;		
+		if(vscode.workspace.workspaceFolders.length >= 1){
+			let dotGitFolderPath:string = vscode.workspace.workspaceFolders[0].uri.fsPath;
+			if(fileUtil.IsFileExists(dotGitFolderPath)){
+				ret = true;
+			}
+		}
+		
+		return ret;
 	}
 	private gitCmd(gitCmdOption:string):string {
 		let ret:string = "";

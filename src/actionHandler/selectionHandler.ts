@@ -17,17 +17,13 @@ export default class SelectionHandler{
 	constructor(_config:OutputSectionConfig){
 		this.config = _config;
 		this.selectionInfo = new SelectionInfo();
-		if(GitInfo.CanUse()){
-			this.gitInfo = new GitInfo();
-			this.svnInfo = null;
+		this.gitInfo = GitInfo.CreateGitInfo();
+		this.svnInfo = SvnInfo.CreateSvnInfo();
+		if(this.gitInfo !== null){
 			this.repoType="git";
-		}else if(SvnInfo.CanUse()){
-			this.gitInfo = null;
-			this.svnInfo = new SvnInfo();
+		}else if(this.svnInfo !== null){
 			this.repoType="svn";
 		}else{
-			this.gitInfo = null;
-			this.svnInfo = null;
 			this.repoType="none";
 		}
 	}
@@ -72,7 +68,7 @@ export default class SelectionHandler{
 					gitHeadCommitDate = this.gitInfo.headCommit.committerDate;
 				}
 				if(matchedSymbols.includes("${gitUrl}")){
-					gitUrl = this.gitInfo.GetUrl(fileFullPath);
+					gitUrl = this.gitInfo.GetUrl(this.selectionInfo.fileRelativePath);
 				}
 				if(matchedSymbols.includes("${repoVer}")){
 					repoVer = gitHeadCommitSHA;

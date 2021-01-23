@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import SelectionInfo from '../InfoParser/SelectionInfo';
-import * as path from 'path'
 
 export default class ReadingActionHandler {
 	isTraceModeEnable: boolean = false;

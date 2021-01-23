@@ -12,12 +12,15 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "",
-                "--extensionDevelopmentPath=${workspaceFolder}"
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                // "${workspaceFolder}/test/c_proj/src"
+                "C:/work/study/toppers_asp3_3.5"
+
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "watch",
+            // "preLaunchTask": "watch",
             "smartStep": true,
             "presentation": {
                 "hidden": false,

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
-import {execSync} from 'child_process';
+import {exec, execSync} from 'child_process';
 import * as path from 'path';
 
 export interface SvnCommitInfo {
@@ -12,27 +12,32 @@ export interface SvnCommitInfo {
 
 export class SvnInfo {
 	workspaceRootDirPath:string;
-	dotSvnFolderPath:string;
 
 	branch:string;
 	headCommit:SvnCommitInfo;
+	static CreateSvnInfo():SvnInfo{
+		let ret:SvnInfo = null;
+		// if svn command failed, return null
+		if(fileUtil.CanCmdExec("svn --version")){
+			ret = new SvnInfo();
+		}else{
+			ret = null;
+		}
+
+		return ret;
+	}
 	constructor(){
-		this.workspaceRootDirPath = vscode.workspace.rootPath;
-		this.dotSvnFolderPath = path.join(this.workspaceRootDirPath, ".svn");
+		this.workspaceRootDirPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
 		this.headCommit = {
 			rev:undefined, 
 			commitMessage: "", 
 			committerDate: "", 
 			committerName: ""
 		};
-		
-		if( this.IsSvnExeExist() === true &&
-			fileUtil.IsFileExists(this.dotSvnFolderPath) === true){
-			this.Update();
-		}
+		this.Update();
 	}
 	public Update() {
-		// this.branch = this.svnCmd("symbolic-ref --short HEAD");
+		this.branch = this.svnCmd("symbolic-ref --short HEAD");
 		// this.headCommit.rev = this.svnCmd(`info --show-item revision`);
 	}
 
@@ -45,19 +50,6 @@ export class SvnInfo {
 		let rev:string = this.svnCmd(`info --show-item url ${filePath}`);
 
 		return rev;
-	}
-	public static CanUse():boolean{
-		let ret:boolean = true;
-		return ret;
-	}
-	private IsSvnExeExist():boolean {
-		let cmdRet:string = execSync("svn --version").toString().trim();
-
-		if(cmdRet.match(/svn, version/) === null){
-			return false;
-		}else{
-			return true;
-		}
 	}
 	private svnCmd(svnCmdOption:string):string {
 		let ret:string = "";

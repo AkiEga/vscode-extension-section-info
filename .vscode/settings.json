@@ -7,5 +7,5 @@
         "out": true // set this to false to include "out" folder in search results
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled",
-    "watch"
+    "files.trimTrailingWhitespace": true
 }

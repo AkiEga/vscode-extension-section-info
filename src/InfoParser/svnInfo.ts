@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
-import {exec, execSync} from 'child_process';
-import * as path from 'path';
+import {execSync} from 'child_process';
 
 export interface SvnCommitInfo {
 	rev:number|undefined;
@@ -11,10 +10,10 @@ export interface SvnCommitInfo {
 }
 
 export class SvnInfo {
-	branch:string;
+	branch:string = "";
 	headCommit:SvnCommitInfo;
-	static CreateSvnInfo():SvnInfo{
-		let ret:SvnInfo = null;
+	static CreateSvnInfo():SvnInfo | null {
+		let ret:SvnInfo | null = null;
 		// if svn command failed, return null
 		if(fileUtil.CanCmdExec("svn --version")){
 			ret = new SvnInfo();
@@ -26,16 +25,15 @@ export class SvnInfo {
 	}
 	constructor(){
 		this.headCommit = {
-			rev:undefined, 
-			commitMessage: "", 
-			committerDate: "", 
+			rev:undefined,
+			commitMessage: "",
+			committerDate: "",
 			committerName: ""
 		};
 		this.Update();
 	}
 	public Update() {
 		this.branch = this.svnCmd("symbolic-ref --short HEAD");
-		// this.headCommit.rev = this.svnCmd(`info --show-item revision`);
 	}
 
 	public GetRev(filePath:string):number{
@@ -50,10 +48,19 @@ export class SvnInfo {
 	}
 	private svnCmd(svnCmdOption:string):string {
 		let ret:string = "";
-		let curWorkspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
-		ret = execSync(
-			"svn "+svnCmdOption,
-			{cwd: curWorkspace.uri.fsPath}).toString().trim();
+		if (undefined != vscode.window.activeTextEditor) {
+			let curWorkspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
+			if (undefined != curWorkspace) {
+				try {
+					ret = execSync(
+						"svn "+svnCmdOption,
+						{cwd: curWorkspace.uri.fsPath}).toString().trim();
+				} catch(e: any) {
+					console.error("[ERR] occur in func: svnCmd\n");
+					console.error(e);
+				}
+			}
+		}
 		return ret;
 	}
 }

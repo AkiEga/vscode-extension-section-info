@@ -5,19 +5,16 @@ import * as path from 'path';
 
 export interface GitCommitInfo {
 	SHA:string;
-	comment:string;	
+	comment:string;
 	committerName:string;
 	committerDate:string;
 }
 
 export class GitInfo {
-	workspaceRootDirPath:string;
-	dotGitFolderPath:string;
-
-	branch:string;
+	branch:string = "";
 	headCommit:GitCommitInfo;
 	tag?:string;
-	static CreateGitInfo():GitInfo {
+	static CreateGitInfo(): GitInfo | null {
 		if( fileUtil.CanCmdExec("git --version") === true &&
 			GitInfo.IsDotGitDirExists() === true){
 			return new GitInfo();
@@ -26,10 +23,8 @@ export class GitInfo {
 		}
 	}
 	constructor(){
-		this.workspaceRootDirPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-		this.dotGitFolderPath = path.join(this.workspaceRootDirPath, ".git");
 		this.headCommit = {SHA:"", comment: "", committerDate: "", committerName: ""};
-		
+
 		this.Update();
 	}
 	public Update() {
@@ -47,21 +42,19 @@ export class GitInfo {
 		return ret;
 	}
 	public static IsDotGitDirExists():boolean {
-		let ret:boolean = false;		
-		if(vscode.workspace.workspaceFolders.length >= 1){
-			let dotGitFolderPath:string = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri).uri.fsPath;
-			if(fileUtil.IsFileExists(dotGitFolderPath)){
-				ret = true;
-			}
+		let ret:boolean = false;
+		let dotGitFolderPath:string = path.join(fileUtil.getWorkspaceDirPath(), ".git");
+		if(fileUtil.IsFileExists(dotGitFolderPath)){
+			ret = true;
 		}
-		
+
 		return ret;
 	}
 	private gitCmd(gitCmdOption:string):string {
 		let ret:string = "";
 		ret = execSync(
 			"git "+gitCmdOption,
-			{cwd: this.workspaceRootDirPath}).toString().trim();
+			{cwd: fileUtil.getWorkspaceDirPath()}).toString().trim();
 		return ret;
 	}
 }

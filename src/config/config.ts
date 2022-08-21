@@ -5,8 +5,8 @@ export enum EN_SH_MD_STYLE{
 	JIRA
 }
 export class styleFormat implements vscode.QuickPickItem{
-	label:string;
-	format: string;
+	label: string = "";
+	format: string = "";
 }
 
 export default class OutputSectionConfig{
@@ -16,9 +16,9 @@ export default class OutputSectionConfig{
 		this.formats = [];
 		this.initFromVscodeSetting();
 	}
-	private initFromVscodeSetting(){		
-		let formats:styleFormat[] = vscode.workspace.getConfiguration().get<styleFormat[]>("section-info.output.formats");
-		if(formats){
+	private initFromVscodeSetting(){
+		let formats:styleFormat[] | undefined = vscode.workspace.getConfiguration().get<styleFormat[]>("section-info.output.formats");
+		if (undefined != formats) {
 			this.formats = formats;
 		}
 	}
@@ -27,17 +27,12 @@ export default class OutputSectionConfig{
 		if(this.formats.length === 0){
 			selectedStyleFormat = this.getDefaultFormatConfig();
 		}else if(this.formats.length === 1){
-			selectedStyleFormat = this.formats[0];			
+			selectedStyleFormat = this.formats[0];
 		}else if(this.formats.length > 2){
-			// let items : vscode.QuickPickItem[];
-			// this.formats.forEach(f => {
-			// 	items.push({
-			// 		label: f.label,
-			// 		description: f.label,
-			// 		alwaysShow : true,
-			// 	});
-			// });
-			selectedStyleFormat = await vscode.window.showQuickPick(this.formats);
+			let pickupedFormat:styleFormat | undefined = await vscode.window.showQuickPick(this.formats);
+			if (undefined != pickupedFormat) {
+				selectedStyleFormat = pickupedFormat;
+			}
 		}
 
 		return new Promise<styleFormat>((resolve)=>{

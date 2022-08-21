@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
-
+import * as vscode from 'vscode';
 
 export function IsFileExists(filePath:string){
 	try{
@@ -15,7 +15,7 @@ export function IsFileExists(filePath:string){
 }
 
 export function CanCmdExec(cmdStr:string):boolean {
-	let ret:boolean;
+	let ret:boolean = true;
 	try{
 		exec(cmdStr, (error) => {
 			if ( error instanceof Error) {
@@ -27,6 +27,19 @@ export function CanCmdExec(cmdStr:string):boolean {
 		})
 	}catch(e){
 		ret = false;
+	}
+	return ret;
+}
+
+export function getWorkspaceDirPath(): string {
+	let ret: string = "";
+	let editor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+	if (undefined != editor) {
+		let workspaceFolder: vscode.WorkspaceFolder | undefined  = vscode.workspace.getWorkspaceFolder(editor.document.uri)
+
+		if((undefined != workspaceFolder) && (IsFileExists(workspaceFolder.uri.fsPath))) {
+			ret = workspaceFolder.uri.fsPath;
+		}
 	}
 	return ret;
 }

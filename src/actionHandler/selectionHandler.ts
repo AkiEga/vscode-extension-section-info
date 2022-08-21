@@ -1,5 +1,4 @@
 import { SvnInfo } from './../InfoParser/svnInfo';
-//import { SelectionInfo } from './selection';
 import * as vscode from 'vscode';
 import {styleFormat} from '../config/config';
 import OutputSectionConfig, { EN_SH_MD_STYLE } from '../config/config';
@@ -11,8 +10,8 @@ import SelectionInfo from '../InfoParser/SelectionInfo';
 export default class SelectionHandler{
 	config:OutputSectionConfig;
 	selectionInfo:SelectionInfo;
-	gitInfo:GitInfo;
-	svnInfo:SvnInfo;
+	gitInfo:GitInfo | null;
+	svnInfo:SvnInfo | null;
 	repoType:string;
 	constructor(_config:OutputSectionConfig){
 		this.config = _config;
@@ -30,8 +29,14 @@ export default class SelectionHandler{
 	public async CopyFromSelectionInfo():Promise<void>{
 		// assigned templates with analyzed results
 		let selectedStyleFormat:styleFormat = await this.config.getSeletedStyleFormat();
-		let matchedSymbols:RegExpMatchArray = selectedStyleFormat.format.match(/\${\w+}/g);
-		await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection, matchedSymbols);
+		let matchedSymbols:RegExpMatchArray | null = selectedStyleFormat.format.match(/\${\w+}/g);
+		if ((undefined == vscode.window.activeTextEditor) || (undefined == matchedSymbols)) {
+			return new Promise<void>((resolve)=>{
+				resolve();
+			});
+		} else {
+			await this.selectionInfo.Parse(vscode.window.activeTextEditor, matchedSymbols);
+		}
 
 		let vscodeCmd:string = this.selectionInfo.vscodeCmd;
 		// # path
@@ -45,30 +50,30 @@ export default class SelectionHandler{
 
 		// # for repository
 		// ## git
-		let gitBranchName:string = "";
-		let gitHeadCommitSHA:string = "";
-		let gitHeadCommitDate:string = "";
+		let gitBranchName:string | undefined = "";
+		let gitHeadCommitSHA:string | undefined = "";
+		let gitHeadCommitDate:string | undefined = "";
 		let gitUrl:string = "";
 		// ## svn
-		let svnRev:number = -1;
-		let svnUrl:string = "";
-		// ## common		
-		let repoType:string=this.repoType;
-		let repoVer:string="";
-		let repoUrl:string="";
+		let svnRev:number | undefined = -1;
+		let svnUrl:string | undefined = "";
+		// ## common
+		let repoType:string = this.repoType;
+		let repoVer:string | undefined ="";
+		let repoUrl:string | undefined ="";
 		switch(this.repoType){
 			case "git":
 				if(matchedSymbols.includes("${gitBranchName}")){
-					gitBranchName = this.gitInfo.branch;
+					gitBranchName = this.gitInfo?.branch;
 				}
 				if(matchedSymbols.includes("${gitHeadCommitSHA}")){
-					gitHeadCommitSHA = this.gitInfo.headCommit.SHA;
+					gitHeadCommitSHA = this.gitInfo?.headCommit.SHA;
 				}
 				if(matchedSymbols.includes("${gitHeadCommitDate}")){
-					gitHeadCommitDate = this.gitInfo.headCommit.committerDate;
+					gitHeadCommitDate = this.gitInfo?.headCommit.committerDate;
 				}
 				if(matchedSymbols.includes("${gitUrl}")){
-					gitUrl = this.gitInfo.GetUrl(this.selectionInfo.fileRelativePath);
+					repoUrl = this.gitInfo?.GetUrl(this.selectionInfo.fileRelativePath);
 				}
 				if(matchedSymbols.includes("${repoVer}")){
 					repoVer = gitHeadCommitSHA;
@@ -79,13 +84,13 @@ export default class SelectionHandler{
 				break;
 			case "svn":
 				if(matchedSymbols.includes("${svnRev}")){
-					svnRev = this.svnInfo.GetRev(this.selectionInfo.fileFullPath);
+					svnRev = this.svnInfo?.GetRev(this.selectionInfo.fileFullPath);
 				}
 				if(matchedSymbols.includes("${svnUrl}")){
-					svnUrl = this.svnInfo.GetUrl(this.selectionInfo.fileFullPath);
+					svnUrl = this.svnInfo?.GetUrl(this.selectionInfo.fileFullPath);
 				}
 				if(matchedSymbols.includes("${repoVer}")){
-					repoVer = svnRev.toString();
+					repoVer = svnRev?.toString();
 				}
 				if(matchedSymbols.includes("${repoUrl}")){
 					repoUrl = svnUrl;
@@ -96,17 +101,15 @@ export default class SelectionHandler{
 				break;
 		}
 		let allParam:object = {
-			vscodeCmd, 
-			fileFullPath, fileRelativePath, 
-			line, lang, func, 
-			selectionText, 
+			vscodeCmd,
+			fileFullPath, fileRelativePath,
+			line, lang, func,
+			selectionText,
 			gitBranchName, gitHeadCommitSHA, gitHeadCommitDate,
-			svnRev, svnUrl, 
+			svnRev, svnUrl,
 			repoType, repoVer, repoUrl
 		};
-		// console.log(allParam)
 
-		
 		let copyText:string = await template(selectedStyleFormat.format, allParam);
 		await vscode.env.clipboard.writeText(copyText);
 		console.log(`Now copied! Selected Style Format: "${selectedStyleFormat.label}".`);

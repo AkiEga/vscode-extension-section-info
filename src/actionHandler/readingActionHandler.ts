@@ -4,16 +4,16 @@ import SelectionInfo from '../InfoParser/SelectionInfo';
 export default class ReadingActionHandler {
 	isTraceModeEnable: boolean = false;
 	traceLog:string = "";
-	selectionInfo:SelectionInfo = null;
-	editor:vscode.TextEditor;
-	doc:vscode.TextDocument;
+	selectionInfo:SelectionInfo | null = null;
+	editor:vscode.TextEditor | null = null;
+	doc:vscode.TextDocument | null = null;
 	constructor(){
 		this.selectionInfo = new SelectionInfo();
 	}
 	async enableTraceMode():Promise<void>{
 		this.isTraceModeEnable = true;
 
-		this.doc = await vscode.workspace.openTextDocument();		
+		this.doc = await vscode.workspace.openTextDocument();
 		let editorOption:vscode.TextDocumentShowOptions = {
 			preview: false,
 			viewColumn:vscode.ViewColumn.Beside,
@@ -27,26 +27,6 @@ export default class ReadingActionHandler {
 		})
 	}
 	async showCallFlow():Promise<void> {
-// 		let si = await this.selectionInfo.Parse(vscode.window.activeTextEditor.selection);
-
-// 		let text:string = 
-// `
-// \`\`\`${si.language}
-// ${si.selectedText}
-// \`\`\`
-// (file: ${si.fileRelativePath}, line: ${si.startLine}, func: ${si.function})
-
-// `;
-
-// 		let endPos:vscode.Position 
-// 			= this.doc.positionAt(this.doc.getText().length);
-// 		this.editor.edit((editBuilder: vscode.TextEditorEdit) => {
-// 			editBuilder.insert(endPos, text);
-// 		})
-
-// 		return new Promise<void>(resolve=>{
-// 			resolve();
-// 		})
 	}
 
 }

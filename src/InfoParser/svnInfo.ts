@@ -11,8 +11,6 @@ export interface SvnCommitInfo {
 }
 
 export class SvnInfo {
-	workspaceRootDirPath:string;
-
 	branch:string;
 	headCommit:SvnCommitInfo;
 	static CreateSvnInfo():SvnInfo{
@@ -27,7 +25,6 @@ export class SvnInfo {
 		return ret;
 	}
 	constructor(){
-		this.workspaceRootDirPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
 		this.headCommit = {
 			rev:undefined, 
 			commitMessage: "", 
@@ -53,9 +50,10 @@ export class SvnInfo {
 	}
 	private svnCmd(svnCmdOption:string):string {
 		let ret:string = "";
+		let curWorkspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
 		ret = execSync(
 			"svn "+svnCmdOption,
-			{cwd: this.workspaceRootDirPath}).toString().trim();
+			{cwd: curWorkspace.uri.fsPath}).toString().trim();
 		return ret;
 	}
 }

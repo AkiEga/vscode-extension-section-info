@@ -6,7 +6,7 @@ export enum EN_SH_MD_STYLE{
 }
 export class styleFormat implements vscode.QuickPickItem{
 	label:string;
-	format:string;
+	format: string;
 }
 
 export default class OutputSectionConfig{
@@ -28,7 +28,15 @@ export default class OutputSectionConfig{
 			selectedStyleFormat = this.getDefaultFormatConfig();
 		}else if(this.formats.length === 1){
 			selectedStyleFormat = this.formats[0];			
-		}else if(this.formats.length > 2){			
+		}else if(this.formats.length > 2){
+			// let items : vscode.QuickPickItem[];
+			// this.formats.forEach(f => {
+			// 	items.push({
+			// 		label: f.label,
+			// 		description: f.label,
+			// 		alwaysShow : true,
+			// 	});
+			// });
 			selectedStyleFormat = await vscode.window.showQuickPick(this.formats);
 		}
 

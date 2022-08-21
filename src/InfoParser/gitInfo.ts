@@ -49,7 +49,7 @@ export class GitInfo {
 	public static IsDotGitDirExists():boolean {
 		let ret:boolean = false;		
 		if(vscode.workspace.workspaceFolders.length >= 1){
-			let dotGitFolderPath:string = vscode.workspace.workspaceFolders[0].uri.fsPath;
+			let dotGitFolderPath:string = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri).uri.fsPath;
 			if(fileUtil.IsFileExists(dotGitFolderPath)){
 				ret = true;
 			}

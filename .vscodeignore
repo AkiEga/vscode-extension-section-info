@@ -1,5 +1,7 @@
 .vscode/**
 .vscode-test/**
+doc
+node_modules
 out/test/**
 out/**/*.map
 src/**
@@ -7,3 +9,4 @@ src/**
 tsconfig.json
 vsc-extension-quickstart.md
 tslint.json
+yarn-error.log

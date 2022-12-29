@@ -14,8 +14,6 @@
                 "",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 // "${workspaceFolder}/test/c_proj/src"
-                "C:/work/qmk/qmk_firmware"
-
             ],
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"

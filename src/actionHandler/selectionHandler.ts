@@ -48,6 +48,11 @@ export default class SelectionHandler{
 		let func:string = this.selectionInfo.function;
 		let selectionText:string = this.selectionInfo.selectedText;
 
+		// # for lanuage
+		if (lang == "c") {
+			lang = "c++"
+		}
+
 		// # for repository
 		// ## git
 		let gitBranchName:string | undefined = "";

@@ -17,6 +17,10 @@ export class SvnInfo {
 		// if svn command failed, return null
 		if(fileUtil.CanCmdExec("svn --version")){
 			ret = new SvnInfo();
+			// if error occur in `svn info` cmd, return null
+			if (ret.svnCmd("info") == null) {
+				ret = null;
+			}
 		}else{
 			ret = null;
 		}
@@ -33,21 +37,24 @@ export class SvnInfo {
 		this.Update();
 	}
 	public Update() {
-		this.branch = this.svnCmd("symbolic-ref --short HEAD");
+		let ret = this.svnCmd("symbolic-ref HEAD");
+		this.branch = ret?ret:"";
 	}
 
 	public GetRev(filePath:string):number{
-		let rev:number = Number(this.svnCmd(`info --show-item revision ${filePath}`));
+		let ret = this.svnCmd(`info --show-item revision ${filePath}`);
+		let rev:number = ret?Number(ret):-1;
 
 		return rev;
 	}
 	public GetUrl(filePath:string):string{
-		let rev:string = this.svnCmd(`info --show-item url ${filePath}`);
+		let ret = this.svnCmd(`info --show-item url ${filePath}`);
+		let url:string = ret?ret:"";
 
-		return rev;
+		return url;
 	}
-	private svnCmd(svnCmdOption:string):string {
-		let ret:string = "";
+	private svnCmd(svnCmdOption:string):string|null {
+		let ret:string|null = "";
 		if (undefined != vscode.window.activeTextEditor) {
 			let curWorkspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
 			if (undefined != curWorkspace) {
@@ -58,6 +65,7 @@ export class SvnInfo {
 				} catch(e: any) {
 					console.error("[ERR] occur in func: svnCmd\n");
 					console.error(e);
+					ret = null;
 				}
 			}
 		}

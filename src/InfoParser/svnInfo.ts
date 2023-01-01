@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
 import {execSync} from 'child_process';
+import * as path from 'path';
 
 export interface SvnCommitInfo {
 	rev:number|undefined;
@@ -38,8 +39,9 @@ export class SvnInfo {
 		this.Update();
 	}
 	public Update() {
-		let ret = this.svnCmd("symbolic-ref HEAD");
-		this.branch = ret?ret:"";
+		// no support branck name
+		// let ret = this.svnCmd("symbolic-ref HEAD");
+		// this.branch = ret?ret:"";
 	}
 
 	public GetRev(filePath:string):number{

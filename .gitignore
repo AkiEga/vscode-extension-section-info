@@ -4,3 +4,4 @@ node_modules
 *.vsix
 PackageAccessToken.txt
 PersonalAccessToken.txt
+vsce_publish.sh

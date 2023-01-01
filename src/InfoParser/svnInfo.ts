@@ -15,14 +15,15 @@ export class SvnInfo {
 	static CreateSvnInfo():SvnInfo | null {
 		let ret:SvnInfo | null = null;
 		// if svn command failed, return null
-		if(fileUtil.CanCmdExec("svn --version")){
-			ret = new SvnInfo();
-			// if error occur in `svn info` cmd, return null
-			if (ret.svnCmd("info") == null) {
-				ret = null;
+		if (fileUtil.CanCmdExec("svn --version")) {
+			for(let ws of fileUtil.getWorkspaceDirs()) {
+				try {
+					execSync("svn info", {cwd: ws.uri.fsPath});
+					// if succeed in svn cmd, return svnInfo obj
+					ret = new SvnInfo();
+					break;
+				} catch(e: any) { /* no action */ }
 			}
-		}else{
-			ret = null;
 		}
 
 		return ret;

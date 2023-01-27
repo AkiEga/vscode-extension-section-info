@@ -28,7 +28,7 @@ export default class OutputSectionConfig{
 			selectedStyleFormat = this.getDefaultFormatConfig();
 		}else if(this.formats.length === 1){
 			selectedStyleFormat = this.formats[0];
-		}else if(this.formats.length > 2){
+		}else if(this.formats.length >= 2){
 			let pickupedFormat:styleFormat | undefined = await vscode.window.showQuickPick(this.formats);
 			if (undefined != pickupedFormat) {
 				selectedStyleFormat = pickupedFormat;

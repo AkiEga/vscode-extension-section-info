@@ -16,8 +16,11 @@ export default class SelectionHandler{
 	constructor(_config:OutputSectionConfig){
 		this.config = _config;
 		this.selectionInfo = new SelectionInfo();
+
 		this.gitInfo = GitInfo.CreateGitInfo();
 		this.svnInfo = SvnInfo.CreateSvnInfo();
+
+		// detect repository type
 		if(this.gitInfo !== null){
 			this.repoType="git";
 		}else if(this.svnInfo !== null){

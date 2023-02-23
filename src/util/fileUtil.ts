@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { execSync, ExecSyncOptions } from 'child_process';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
@@ -16,15 +16,15 @@ export function IsFileExists(filePath:string){
 
 export function CanCmdExec(cmdStr:string):boolean {
 	let ret:boolean = true;
+	let options:ExecSyncOptions = {
+		// stdio settings for silent cmd execution
+		//       stdin,   stdout,   stderr
+		// Ref) Child process | Node.js v19.6.1 Documentation
+		// https://nodejs.org/api/child_process.html#optionsstdioef)
+		stdio: ['ignore', 'ignore', 'ignore']
+	};
 	try{
-		exec(cmdStr, (error) => {
-			if ( error instanceof Error) {
-				console.error(error);
-				throw Error;
-			} else {
-				ret = true;
-			}
-		})
+		execSync(cmdStr, options);
 	}catch(e){
 		ret = false;
 	}

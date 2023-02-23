@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
-import {execSync} from 'child_process';
+import { execSync, ExecSyncOptions } from 'child_process';
 import * as path from 'path';
+import * as os from 'os';
 
 export interface SvnCommitInfo {
 	rev:number|undefined;
@@ -18,8 +19,12 @@ export class SvnInfo {
 		// if svn command failed, return null
 		if (fileUtil.CanCmdExec("svn --version")) {
 			for(let ws of fileUtil.getWorkspaceDirs()) {
+				let options:ExecSyncOptions = {
+					cwd: ws.uri.fsPath,
+					stdio: ["ignore", "ignore", "ignore"]
+				};
 				try {
-					execSync("svn info", {cwd: ws.uri.fsPath});
+					execSync("svn info", options);
 					// if succeed in svn cmd, return svnInfo obj
 					ret = new SvnInfo();
 					break;

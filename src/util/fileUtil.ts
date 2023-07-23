@@ -34,7 +34,9 @@ export function CanCmdExec(cmdStr:string):boolean {
 export function getWorkspaceDirs(): vscode.WorkspaceFolder[] {
 	let ret:vscode.WorkspaceFolder[] = [];
 	if (vscode.workspace.workspaceFolders != undefined) {
-		ret = vscode.workspace.workspaceFolders;
+		for(let ws of vscode.workspace.workspaceFolders) {
+			ret.push(ws);
+		}
 	}
 	return ret;
 }

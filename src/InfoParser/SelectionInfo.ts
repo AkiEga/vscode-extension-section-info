@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { styleFormat } from '../config/config';
 
 export default class SelectionInfo {
 	// line

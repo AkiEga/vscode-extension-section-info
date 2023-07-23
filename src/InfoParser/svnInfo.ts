@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
 import { execSync, ExecSyncOptions } from 'child_process';
-import * as path from 'path';
-import * as os from 'os';
 
 export interface SvnCommitInfo {
 	rev:number|undefined;
@@ -49,9 +47,9 @@ export class SvnInfo {
 		// this.branch = ret?ret:"";
 	}
 
-	public GetRev(filePath:string):number{
+	public GetRev(filePath:string):string{
 		let ret = this.svnCmd(`info --show-item revision ${filePath}`);
-		let rev:number = ret?Number(ret):-1;
+		let rev:string = ret?String(ret):"-1";
 
 		return rev;
 	}

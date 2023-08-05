@@ -1,6 +1,5 @@
-import * as vscode from 'vscode';
 import * as fileUtil from '../util/fileUtil';
-import {exec, execSync} from 'child_process';
+import { execSync } from 'child_process';
 import * as path from 'path';
 
 export interface GitCommitInfo {

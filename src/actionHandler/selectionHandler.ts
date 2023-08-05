@@ -2,7 +2,6 @@ import { SvnInfo } from './../InfoParser/svnInfo';
 import * as vscode from 'vscode';
 import {styleFormat} from '../config/config';
 import OutputSectionConfig, { EN_SH_MD_STYLE } from '../config/config';
-import * as template from 'es6-template-strings';
 
 import { GitInfo, GitCommitInfo } from '../InfoParser/gitInfo';
 import SelectionInfo from '../InfoParser/SelectionInfo';
@@ -63,7 +62,7 @@ export default class SelectionHandler{
 		let gitHeadCommitDate:string | undefined = "";
 		let gitUrl:string = "";
 		// ## svn
-		let svnRev:number | undefined = -1;
+		let svnRev:string | undefined = "-1";
 		let svnUrl:string | undefined = "";
 		// ## common
 		let repoType:string = this.repoType;
@@ -108,17 +107,30 @@ export default class SelectionHandler{
 			default:
 				break;
 		}
-		let allParam:object = {
-			vscodeCmd,
-			fileFullPath, fileRelativePath,
-			line, lang, func,
-			selectionText,
-			gitBranchName, gitHeadCommitSHA, gitHeadCommitDate,
-			svnRev, svnUrl,
-			repoType, repoVer, repoUrl
+		let allParam:{ [name: string]: string } = {
+			"vscodeCmd": vscodeCmd,
+			"fileFullPath": fileFullPath,
+			"fileRelativePath": fileRelativePath,
+			"line": line,
+			"lang": lang,
+			"func": func,
+			"selectionText": selectionText,
+			"gitBranchName": gitBranchName??"",
+			"gitHeadCommitSHA": gitHeadCommitSHA??"",
+			"gitHeadCommitDate": gitHeadCommitDate??"",
+			"svnRev": svnRev??"",
+			"svnUrl": svnUrl??"",
+			"repoType,": repoType,
+			"repoVer": repoVer??"",
+			"repoUr": repoUrl??""
 		};
 
-		let copyText:string = await template(selectedStyleFormat.format, allParam);
+		// let copyText:string = await template(selectedStyleFormat.format, allParam);
+		let copyText:string = selectedStyleFormat.format;
+		for(let key in allParam){
+			copyText = copyText.replace(new RegExp(`\\$\\{${key}\\}`, "g"), allParam[key].toString());
+		}
+
 		await vscode.env.clipboard.writeText(copyText);
 		console.log(`Now copied! Selected Style Format: "${selectedStyleFormat.label}".`);
 

@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
     // The commandId parameter must match the command field in package.json
     context.subscriptions.push(
         vscode.commands.registerCommand('extension.QuickCopyAsMd.copyToClipboard', () => {
-            sh.CopyFromSelectionInfo();
+            sh.copyFromSelectionInfo();
         })
     );
 

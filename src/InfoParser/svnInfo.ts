@@ -12,10 +12,12 @@ export interface SvnCommitInfo {
 export class SvnInfo {
 	branch:string = "";
 	headCommit:SvnCommitInfo;
-	static CreateSvnInfo():SvnInfo | null {
+	static createSvnInfo():SvnInfo | null {
 		let ret:SvnInfo | null = null;
+		// detect svn command exist
+
 		// if svn command failed, return null
-		if (fileUtil.CanCmdExec("svn --version")) {
+		if (fileUtil.canCmdExec("svn --version")) {
 			for(let ws of fileUtil.getWorkspaceDirs()) {
 				let options:ExecSyncOptions = {
 					cwd: ws.uri.fsPath,
@@ -39,21 +41,21 @@ export class SvnInfo {
 			committerDate: "",
 			committerName: ""
 		};
-		this.Update();
+		this.update();
 	}
-	public Update() {
+	public update() {
 		// no support branck name
 		// let ret = this.svnCmd("symbolic-ref HEAD");
 		// this.branch = ret?ret:"";
 	}
 
-	public GetRev(filePath:string):string{
+	public getRev(filePath:string):string{
 		let ret = this.svnCmd(`info --show-item revision ${filePath}`);
 		let rev:string = ret?String(ret):"-1";
 
 		return rev;
 	}
-	public GetUrl(filePath:string):string{
+	public getUrl(filePath:string):string{
 		let ret = this.svnCmd(`info --show-item url ${filePath}`);
 		let url:string = ret?ret:"";
 
@@ -61,9 +63,9 @@ export class SvnInfo {
 	}
 	private svnCmd(svnCmdOption:string):string|null {
 		let ret:string|null = "";
-		if (undefined != vscode.window.activeTextEditor) {
+		if (undefined !== vscode.window.activeTextEditor) {
 			let curWorkspace = vscode.workspace.getWorkspaceFolder(vscode.window.activeTextEditor.document.uri);
-			if (undefined != curWorkspace) {
+			if (undefined !== curWorkspace) {
 				try {
 					ret = execSync(
 						"svn "+svnCmdOption,

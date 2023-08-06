@@ -1,7 +1,7 @@
 import { SvnInfo } from './../InfoParser/svnInfo';
 import * as vscode from 'vscode';
-import {styleFormat} from '../config/config';
-import OutputSectionConfig, { EN_SH_MD_STYLE } from '../config/config';
+import {StyleFormat} from '../config/config';
+import OutputSectionConfig from '../config/config';
 
 import { GitInfo, GitCommitInfo } from '../InfoParser/gitInfo';
 import SelectionInfo from '../InfoParser/SelectionInfo';
@@ -16,8 +16,8 @@ export default class SelectionHandler{
 		this.config = _config;
 		this.selectionInfo = new SelectionInfo();
 
-		this.gitInfo = GitInfo.CreateGitInfo();
-		this.svnInfo = SvnInfo.CreateSvnInfo();
+		this.gitInfo = GitInfo.createGitInfo();
+		this.svnInfo = SvnInfo.createSvnInfo();
 
 		// detect repository type
 		if(this.gitInfo !== null){
@@ -28,16 +28,16 @@ export default class SelectionHandler{
 			this.repoType="none";
 		}
 	}
-	public async CopyFromSelectionInfo():Promise<void>{
+	public async copyFromSelectionInfo():Promise<void>{
 		// assigned templates with analyzed results
-		let selectedStyleFormat:styleFormat = await this.config.getSeletedStyleFormat();
+		let selectedStyleFormat:StyleFormat = await this.config.getSeletedStyleFormat();
 		let matchedSymbols:RegExpMatchArray | null = selectedStyleFormat.format.match(/\${\w+}/g);
-		if ((undefined == vscode.window.activeTextEditor) || (undefined == matchedSymbols)) {
+		if ((undefined === vscode.window.activeTextEditor) || (undefined === matchedSymbols)) {
 			return new Promise<void>((resolve)=>{
 				resolve();
 			});
 		} else {
-			await this.selectionInfo.Parse(vscode.window.activeTextEditor, matchedSymbols);
+			await this.selectionInfo.parse(vscode.window.activeTextEditor, matchedSymbols);
 		}
 
 		let vscodeCmd:string = this.selectionInfo.vscodeCmd;
@@ -51,8 +51,8 @@ export default class SelectionHandler{
 		let selectionText:string = this.selectionInfo.selectedText;
 
 		// # for lanuage
-		if (lang == "c") {
-			lang = "c++"
+		if (lang === "c") {
+			lang = "c++";
 		}
 
 		// # for repository
@@ -70,36 +70,36 @@ export default class SelectionHandler{
 		let repoUrl:string | undefined ="";
 		switch(this.repoType){
 			case "git":
-				if(matchedSymbols.includes("${gitBranchName}")){
+				if(matchedSymbols?.includes("${gitBranchName}")){
 					gitBranchName = this.gitInfo?.branch;
 				}
-				if(matchedSymbols.includes("${gitHeadCommitSHA}")){
+				if(matchedSymbols?.includes("${gitHeadCommitSHA}")){
 					gitHeadCommitSHA = this.gitInfo?.headCommit.SHA;
 				}
-				if(matchedSymbols.includes("${gitHeadCommitDate}")){
+				if(matchedSymbols?.includes("${gitHeadCommitDate}")){
 					gitHeadCommitDate = this.gitInfo?.headCommit.committerDate;
 				}
-				if(matchedSymbols.includes("${gitUrl}")){
-					repoUrl = this.gitInfo?.GetUrl(this.selectionInfo.fileRelativePath);
+				if(matchedSymbols?.includes("${gitUrl}")){
+					repoUrl = this.gitInfo?.getUrl(this.selectionInfo.fileRelativePath);
 				}
-				if(matchedSymbols.includes("${repoVer}")){
+				if(matchedSymbols?.includes("${repoVer}")){
 					repoVer = gitHeadCommitSHA;
 				}
-				if(matchedSymbols.includes("${repoUrl}")){
+				if(matchedSymbols?.includes("${repoUrl}")){
 					repoUrl = gitUrl;
 				}
 				break;
 			case "svn":
-				if(matchedSymbols.includes("${svnRev}")){
-					svnRev = this.svnInfo?.GetRev(this.selectionInfo.fileFullPath);
+				if(matchedSymbols?.includes("${svnRev}")){
+					svnRev = this.svnInfo?.getRev(this.selectionInfo.fileFullPath);
 				}
-				if(matchedSymbols.includes("${svnUrl}")){
-					svnUrl = this.svnInfo?.GetUrl(this.selectionInfo.fileFullPath);
+				if(matchedSymbols?.includes("${svnUrl}")){
+					svnUrl = this.svnInfo?.getUrl(this.selectionInfo.fileFullPath);
 				}
-				if(matchedSymbols.includes("${repoVer}")){
+				if(matchedSymbols?.includes("${repoVer}")){
 					repoVer = svnRev?.toString();
 				}
-				if(matchedSymbols.includes("${repoUrl}")){
+				if(matchedSymbols?.includes("${repoUrl}")){
 					repoUrl = svnUrl;
 				}
 				break;
@@ -120,7 +120,7 @@ export default class SelectionHandler{
 			"gitHeadCommitDate": gitHeadCommitDate??"",
 			"svnRev": svnRev??"",
 			"svnUrl": svnUrl??"",
-			"repoType,": repoType,
+			"repoType": repoType,
 			"repoVer": repoVer??"",
 			"repoUr": repoUrl??""
 		};

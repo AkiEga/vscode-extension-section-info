@@ -28,19 +28,19 @@ export default class SelectionInfo {
 		this.function = "";
 		this.language = "";
 	}
-	public async Parse(activeTextEditor: vscode.TextEditor, matchedSymbols:RegExpMatchArray | null): Promise<SelectionInfo> {
+	public async parse(activeTextEditor: vscode.TextEditor, matchedSymbols:RegExpMatchArray | null): Promise<SelectionInfo> {
 		let selection: vscode.Selection = activeTextEditor.selection;
 
 
 		// file path
 		this.fileFullPath = activeTextEditor.document.uri.fsPath.replace(/\\/g, "/");
 
-		if ((null != matchedSymbols) && (matchedSymbols.includes("${fileRelativePath}"))){
+		if ((null !== matchedSymbols) && (matchedSymbols.includes("${fileRelativePath}"))){
 			this.fileRelativePath = vscode.workspace.asRelativePath(this.fileFullPath);
 		}
 
 		// line
-		if ((null != matchedSymbols) && (matchedSymbols.includes("${line}"))) {
+		if ((null !== matchedSymbols) && (matchedSymbols.includes("${line}"))) {
 			this.startLine = (selection.start.line + 1).toString();
 			this.endLine = (selection.end.line + 1).toString();
 			if (selection.isSingleLine) {
@@ -52,7 +52,7 @@ export default class SelectionInfo {
 		}
 
 		// cmd
-		if ((null != matchedSymbols) && (matchedSymbols.includes("${vscodeCmd}"))) {
+		if ((null !== matchedSymbols) && (matchedSymbols.includes("${vscodeCmd}"))) {
 			if (process.platform === 'win32') { // for windows case
 				this.fileVscodePath
 					= `vscode://file/${this.fileFullPath.replace(/(c|C)\:/g, "")}`;
@@ -68,17 +68,17 @@ export default class SelectionInfo {
 		}
 
 		// lang
-		if ((null != matchedSymbols) && (matchedSymbols.includes("${lang}"))) {
+		if ((null !== matchedSymbols) && (matchedSymbols.includes("${lang}"))) {
 			this.language = activeTextEditor.document.languageId;
 		}
 
 		// function
-		if ((null != matchedSymbols) && (matchedSymbols.includes("${func}"))) {
+		if ((null !== matchedSymbols) && (matchedSymbols.includes("${func}"))) {
 			this.function = await this.getFuncName(activeTextEditor);
 		}
 
 		// selectionText
-		if ((null != matchedSymbols) && (matchedSymbols.includes("${selectionText}"))) {
+		if ((null !== matchedSymbols) && (matchedSymbols.includes("${selectionText}"))) {
 			this.selectedText = activeTextEditor.document.getText(selection);
 			this.selectedText = " ".repeat(selection.start.character) + this.selectedText;
 		}
@@ -92,7 +92,7 @@ export default class SelectionInfo {
 	private async getFuncName(activeTextEditor: vscode.TextEditor): Promise<string> {
 		let selection: vscode.Selection = activeTextEditor.selection;
 		let uri = activeTextEditor.document.uri;
-		let matched_func_name: string = "";
+		let matchedFuncName: string = "";
 		let symbol: Array<vscode.SymbolInformation> | undefined;
 		try{
 			symbol
@@ -108,13 +108,13 @@ export default class SelectionInfo {
 			});
 		}
 
-		let function_symbol_kind_index: number = 11;
+		let funcSymbolKindIndex: number = 11;
 		let functions = symbol.filter((elem, index, array) => {
-			return (elem.kind == function_symbol_kind_index);
+			return (elem.kind === funcSymbolKindIndex);
 		});
 		for (let f of functions) {
 			if (f.location.range.start.line <= selection.start.line) {
-				matched_func_name = f.name;
+				matchedFuncName = f.name;
 			}
 			else {
 				break;
@@ -122,24 +122,24 @@ export default class SelectionInfo {
 		}
 		// NOTE: test code for using call tree
 		return new Promise<string>((resolve) => {
-			resolve(matched_func_name);
+			resolve(matchedFuncName);
 		});
 	}
-	private async GetThisFuncRef(activeTextEditor: vscode.TextEditor): Promise<any[]> {
+	private async getThisFuncRef(activeTextEditor: vscode.TextEditor): Promise<any[]> {
 		let uri: vscode.Uri = activeTextEditor.document.uri;
 		let pos: vscode.Position = activeTextEditor.selection.start;
 		let ref: Array<any> | undefined = <Array<any>>await vscode.commands.executeCommand("vscode.executeReferenceProvider", uri, pos);
-		let ref_results: Array<any> = [];
+		let refResults: Array<any> = [];
 		for (let r of ref) {
-			let refed_range: vscode.Range = new vscode.Range(
+			let refedRange: vscode.Range = new vscode.Range(
 				new vscode.Position(r.range.start.line, 0),
 				new vscode.Position(r.range.end.line + 1, 0));
-			let refed_text = activeTextEditor.document.getText(refed_range);
-			console.log(`${refed_text}(file: ${uri.fsPath}, line: ${refed_range.start.line})`);
-			ref_results.push(ref_results);
+			let refedTxt = activeTextEditor.document.getText(refedRange);
+			console.log(`${refedTxt}(file: ${uri.fsPath}, line: ${refedRange.start.line})`);
+			refResults.push(refResults);
 		}
 		return new Promise<any[]>((resolve) => {
-			resolve(ref_results);
+			resolve(refResults);
 		});
 	}
 }

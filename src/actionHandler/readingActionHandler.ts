@@ -24,7 +24,7 @@ export default class ReadingActionHandler {
 
 		return new Promise<void>(resolve=>{
 			resolve();
-		})
+		});
 	}
 	async showCallFlow():Promise<void> {
 	}

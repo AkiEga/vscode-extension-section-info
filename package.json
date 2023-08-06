@@ -53,7 +53,7 @@
     }
   },
   "scripts": {
-    "vscode:publish": "vsce publish minor -p $(cat ../20230723_PersonalAccessToken_Akiega.txt) --yarn",
+    "vscode:publish": "vsce publish minor -p $(cat ../20230723_PersonalAccessToken_Akiega.txt)",
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
     "watch": "webpack --watch",

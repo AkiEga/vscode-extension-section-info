@@ -16,7 +16,7 @@ export class GitInfo {
 	tag?:string;
 	static createGitInfo(): GitInfo | null {
 		if( fileUtil.canCmdExec("git --version") === true &&
-			GitInfo.isDotGitDirExists() === true){
+			GitInfo.checkGitRepoStatus() === true){
 			return new GitInfo();
 		}else{
 			return null;
@@ -42,14 +42,13 @@ export class GitInfo {
 		ret = `${ret}/blob/${this.branch}/${fileRelativePath}`;
 		return ret;
 	}
-	public static isDotGitDirExists():boolean {
-		let ret:boolean = false;
-		let dotGitFolderPath:string = path.join(fileUtil.getWorkspaceDirPath(), ".git");
-		if(fileUtil.isFileExists(dotGitFolderPath)){
-			ret = true;
+	private static checkGitRepoStatus(): boolean {
+		try {
+			execSync('git status', { cwd: fileUtil.getWorkspaceDirPath(), stdio: 'ignore' });
+			return true;
+		} catch (e) {
+			return false;
 		}
-
-		return ret;
 	}
 	private gitCmd(gitCmdOption:string):string {
 		let ret:string = "";

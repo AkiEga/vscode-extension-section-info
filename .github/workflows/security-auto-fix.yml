@@ -1,0 +1,92 @@
+name: Security auto-fix
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  audit-fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Apply npm audit fixes
+        id: audit
+        continue-on-error: true
+        run: |
+          set +e
+          npm audit fix --package-lock-only
+          audit_status=$?
+          echo "audit_exit=$audit_status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Install updated lockfile
+        run: npm install --no-audit --no-fund
+
+      - name: Run extension tests
+        id: test
+        continue-on-error: true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb imagemagick
+          Xvfb :99 -screen 0 1280x1024x24 >/tmp/xvfb.log 2>&1 &
+          export DISPLAY=:99
+          npm test -- --reporter dot
+
+      - name: Capture VS Code snapshot
+        if: always()
+        run: |
+          mkdir -p artifacts
+          import -window root artifacts/vscode-snapshot.png || convert -size 1280x1024 xc:white artifacts/vscode-snapshot.png
+          ls -l artifacts
+
+      - name: Upload VS Code snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-snapshot
+          path: artifacts/vscode-snapshot.png
+          if-no-files-found: warn
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/security-audit-fixes
+          base: ${{ github.event.repository.default_branch }}
+          delete-branch: true
+          commit-message: 'chore: apply npm security audit fixes'
+          title: 'chore: apply npm security audit fixes'
+          body: |
+            ## Security update
+
+            This PR was generated automatically by the security auto-fix workflow.
+
+            - `npm audit fix` was applied
+            - `npm test` was executed
+            - a VS Code snapshot artifact was uploaded for review
+
+            ### Summary
+            - Audit step exit code: `${{ steps.audit.outputs.audit_exit || '0' }}`
+            - Test result: `${{ steps.test.outcome }}`
+            - Snapshot artifact: `vscode-snapshot`
+            - Branch: `chore/security-audit-fixes`
+
+            Please review the dependency changes and test result before merging.

@@ -32,8 +32,8 @@ jobs:
         continue-on-error: true
         run: |
           set +e
-          npm audit fix --package-lock-only
-          audit_status=$?
+          npm audit fix --package-lock-only 2>&1 | tee audit.log
+          audit_status=${PIPESTATUS[0]}
           echo "audit_exit=$audit_status" >> "$GITHUB_OUTPUT"
           exit 0
 
@@ -44,26 +44,26 @@ jobs:
         id: test
         continue-on-error: true
         run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb imagemagick
-          Xvfb :99 -screen 0 1280x1024x24 >/tmp/xvfb.log 2>&1 &
-          export DISPLAY=:99
-          npm test -- --reporter dot
+          set +e
+          npm test -- --reporter dot 2>&1 | tee test.log
+          test_status=${PIPESTATUS[0]}
+          echo "test_exit=$test_status" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Capture VS Code snapshot
+      - name: Write job summary
         if: always()
         run: |
-          mkdir -p artifacts
-          import -window root artifacts/vscode-snapshot.png || convert -size 1280x1024 xc:white artifacts/vscode-snapshot.png
-          ls -l artifacts
-
-      - name: Upload VS Code snapshot
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vscode-snapshot
-          path: artifacts/vscode-snapshot.png
-          if-no-files-found: warn
+          {
+            echo "## Security auto-fix summary"
+            echo "- Audit exit: ${{ steps.audit.outputs.audit_exit || '0' }}"
+            echo "- Test exit: ${{ steps.test.outputs.test_exit || '0' }}"
+            echo "- Branch: chore/security-audit-fixes"
+            echo ""
+            echo "### Test log"
+            echo '```text'
+            tail -n 50 test.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
@@ -79,14 +79,18 @@ jobs:
 
             This PR was generated automatically by the security auto-fix workflow.
 
-            - `npm audit fix` was applied
-            - `npm test` was executed
-            - a VS Code snapshot artifact was uploaded for review
+            - `npm audit fix --package-lock-only` was attempted
+            - `npm test -- --reporter dot` was executed
+            - validation details are included in the workflow summary
 
             ### Summary
-            - Audit step exit code: `${{ steps.audit.outputs.audit_exit || '0' }}`
-            - Test result: `${{ steps.test.outcome }}`
-            - Snapshot artifact: `vscode-snapshot`
-            - Branch: `chore/security-audit-fixes`
+            - Audit exit code: `${{ steps.audit.outputs.audit_exit || '0' }}`
+            - Test exit code: `${{ steps.test.outputs.test_exit || '0' }}`
+            - Validation result: `${{ steps.test.outputs.test_exit == '0' && 'pass' || 'fail' }}`
 
-            Please review the dependency changes and test result before merging.
+            ### Test log
+            ```text
+            ${{ github.workspace }}/test.log
+            ```
+
+            Please review the dependency changes and the test result before merging.

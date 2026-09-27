@@ -1,0 +1,55 @@
+
+> quick-copy-as-markdown@0.55.0 pretest
+> npm run compile-tests && npm run compile && npm run lint
+
+
+> quick-copy-as-markdown@0.55.0 compile-tests
+> tsc -p . --outDir out
+
+
+> quick-copy-as-markdown@0.55.0 compile
+> webpack
+
+    [webpack-cli] Compiler starting... 
+    [webpack-cli] Compiler is using config: '/home/runner/work/vscode-extension-section-info/vscode-extension-section-info/webpack.config.js'
+    [webpack-cli] Compiler finished
+asset [1m[32mextension.js[39m[22m 21.7 KiB [1m[32m[emitted][39m[22m (name: main) 1 related asset
+cacheable modules 19.6 KiB
+  modules by path [1m./src/InfoParser/*.ts[39m[22m 8.71 KiB
+    [1m./src/InfoParser/svnInfo.ts[39m[22m 2.33 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./src/InfoParser/gitInfo.ts[39m[22m 1.82 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./src/InfoParser/SelectionInfo.ts[39m[22m 4.57 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  modules by path [1m./src/actionHandler/*.ts[39m[22m 5.93 KiB
+    [1m./src/actionHandler/selectionHandler.ts[39m[22m 4.98 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./src/actionHandler/readingActionHandler.ts[39m[22m 967 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  [1m./src/extension.ts[39m[22m 1.75 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  [1m./src/config/config.ts[39m[22m 1.49 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  [1m./src/util/fileUtil.ts[39m[22m 1.76 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1mexternal "vscode"[39m[22m 42 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1mexternal "child_process"[39m[22m 42 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1mexternal "fs"[39m[22m 42 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.111.1 compiled [1m[32msuccessfully[39m[22m in 1732 ms
+
+> quick-copy-as-markdown@0.55.0 lint
+> eslint src --ext ts
+
+
+> quick-copy-as-markdown@0.55.0 test
+> node ./out/test/runTest.js --reporter dot
+
+- Resolving version...
+✔ Validated version: 1.139.1
+- Found at https://update.code.visualstudio.com/1.139.1/linux-x64/stable?released=true
+✔ Found at https://update.code.visualstudio.com/1.139.1/linux-x64/stable?released=true
+- Downloading (326.00 MB)
+✔ Downloaded VS Code into /home/runner/work/vscode-extension-section-info/vscode-extension-section-info/.vscode-test/vscode-linux-x64-1.139.1
+[2439:0927/025347.134396:ERROR:ui/ozone/platform/x11/ozone_platform_x11.cc:257] Missing X server or $DISPLAY
+[2439:0927/025347.134450:ERROR:ui/aura/env.cc:246] The platform failed to initialize.  Exiting.
+Exit code:   SIGTRAP
+Failed to run tests TestRunFailedError: Test run terminated with signal SIGTRAP
+    at ChildProcess.onProcessClosed (/home/runner/work/vscode-extension-section-info/vscode-extension-section-info/node_modules/@vscode/test-electron/out/runTest.js:110:24)
+    at ChildProcess.emit (node:events:524:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:293:12) {
+  code: undefined,
+  signal: 'SIGTRAP'
+}
